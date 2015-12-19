@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1>Hola tio</h1>
+</body>
+<div style="font-family: Courier; background-color: black; color: white; width: 100%; height: 600px; overflow: scroll;" id="console">
+
+</div>
+<script>
+    function print(message) {
+        message = message.replace(/\n/g,"<br/>")
+        message = message.replace(/\s/g,"&nbsp;")
+        var element = document.getElementById("console");
+        element.innerHTML += message + "<br/>";
+        element.scrollTop = element.scrollHeight;
+    }
+    var source;
+    if (!!window.EventSource) {
+        source = new EventSource('/emit');
+    } else {
+        print("INTERNET EXPLORER NOT SUPPORTED");
+    }
+    source.addEventListener('message', function(e) {
+        print(""+e.data);
+    }, false);
+
+    source.addEventListener('open', function(e) {
+        print(""+e);
+        print("***************\n*****************")
+        print("*       connection opened      *");
+        print("********************************")
+        // Connection was opened.
+    }, false);
+
+    source.addEventListener('error', function(e) {
+        if (e.readyState == EventSource.CLOSED) {
+            print("**** ERROR: " + e);
+        }
+    }, false);
+
+</script>
+</html>
