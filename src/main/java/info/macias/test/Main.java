@@ -2,11 +2,19 @@ package info.macias.test;
 
 import org.eclipse.jetty.rewrite.handler.RedirectPatternRule;
 import org.eclipse.jetty.rewrite.handler.RewriteHandler;
+import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SessionManager;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.server.session.AbstractSessionManager;
+import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * @author Mario Macías (http://github.com/mariomac)
@@ -42,6 +50,29 @@ public class Main {
 
         server.setHandler(handlerCollection);
 
+//        for(Connector conn : server.getConnectors()) {
+//            if(conn instanceof ServerConnector) {
+//                ((ServerConnector)conn).setIdleTimeout(Integer.MAX_VALUE);
+//                ((ServerConnector)conn).setStopTimeout(Integer.MAX_VALUE);
+//                ((ServerConnector)conn).setSoLingerTime(Integer.MAX_VALUE);
+//                System.out.println("jarl");
+//            } else {
+//                System.out.println("---");
+//            }
+//        }
+
+
+
+//        new Timer().schedule(new TimerTask() {
+//            @Override
+//            public void run() {
+//                try {
+//                    System.err.println("idle threads = " + server.getThreadPool().getIdleThreads() + "\tTotal: " + server.getThreadPool().getThreads());
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        },2000,2000);
         try {
             server.start();
             server.join();
