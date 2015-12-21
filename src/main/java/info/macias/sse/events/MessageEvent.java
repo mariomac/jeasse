@@ -71,7 +71,7 @@ public class MessageEvent {
      *     data: This is a multi-line
      *     data: text that must be transmitted
      * </pre>
-     * @return
+     * @return the string representation of the MessageEvent. Ready to be transmitted.
      */
     public String toString() {
         return toStringCache;

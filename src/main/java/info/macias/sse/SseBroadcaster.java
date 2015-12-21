@@ -24,11 +24,11 @@ public class SseBroadcaster {
 	}
 
 	/**
-	 * Broadcasts a {@link MessageEvent} to all the subscribers, containing only 'event' and 'data' fields.
-	 * <p/>
-	 * This method relies on the {@link SseDispatcher#send(MessageEvent)} method. If this method throws an
+	 * <p>Broadcasts a {@link MessageEvent} to all the subscribers, containing only 'event' and 'data' fields.</p>
+	 *
+	 * <p>This method relies on the {@link SseDispatcher#send(MessageEvent)} method. If this method throws an
 	 * {@link IOException}, the broadcaster assumes the subscriber went offline and silently detaches it
-	 * from the collection of subscribers.
+	 * from the collection of subscribers.</p>
 	 *
 	 * @param event The descriptor of the 'event' field.
 	 * @param data The content of the 'data' field.
@@ -41,11 +41,11 @@ public class SseBroadcaster {
 	}
 
 	/**
-	 * Broadcasts a {@link MessageEvent} to the subscribers.
-	 * <p/>
-	 * This method relies on the {@link SseDispatcher#send(MessageEvent)} method. If this method throws an
+	 * <p>Broadcasts a {@link MessageEvent} to the subscribers.</p>
+	 *
+	 * <p>This method relies on the {@link SseDispatcher#send(MessageEvent)} method. If this method throws an
 	 * {@link IOException}, the broadcaster assumes the subscriber went offline and silently detaches it
-	 * from the collection of subscribers.
+	 * from the collection of subscribers.</p>
 	 *
 	 * @param messageEvent The instance that encapsulates all the desired fields for the {@link MessageEvent}
 	 */
