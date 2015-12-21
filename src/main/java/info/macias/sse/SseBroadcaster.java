@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * @author Mario Macias (http://github.com/mariomac)
+ * @author <a href="http://github.com/mariomac">Mario Macías</a>
  */
 public class SseBroadcaster {
 	private Set<SseDispatcher> dispatchers = new HashSet<>();

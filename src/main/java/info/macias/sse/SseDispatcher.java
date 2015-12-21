@@ -11,15 +11,17 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * @author Mario Macías (http://github.com/mariomac)
+ *
+ *
+ * @author <a href="http://github.com/mariomac">Mario Macías</a>
  */
-public class SseDispatcher implements AsyncListener {
+public class SseDispatcher {
     private final AsyncContext asyncContext;
 
     public SseDispatcher(HttpServletRequest request) {
         asyncContext = request.startAsync();
         asyncContext.setTimeout(0);
-        asyncContext.addListener(this);
+        asyncContext.addListener(new AsyncListenerImpl());
     }
 
     public SseDispatcher ok() {
@@ -65,20 +67,22 @@ public class SseDispatcher implements AsyncListener {
         if(!completed) asyncContext.complete();
     }
 
-    @Override
-    public void onComplete(AsyncEvent event) throws IOException {
-        completed = true;
-    }
+    private class AsyncListenerImpl implements AsyncListener {
+        @Override
+        public void onComplete(AsyncEvent event) throws IOException {
+            completed = true;
+        }
 
-    @Override
-    public void onTimeout(AsyncEvent event) throws IOException {
-    }
+        @Override
+        public void onTimeout(AsyncEvent event) throws IOException {
+        }
 
-    @Override
-    public void onError(AsyncEvent event) throws IOException {
-    }
+        @Override
+        public void onError(AsyncEvent event) throws IOException {
+        }
 
-    @Override
-    public void onStartAsync(AsyncEvent event) throws IOException {
+        @Override
+        public void onStartAsync(AsyncEvent event) throws IOException {
+        }
     }
 }

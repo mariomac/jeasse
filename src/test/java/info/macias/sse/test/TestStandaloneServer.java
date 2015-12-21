@@ -15,6 +15,7 @@ import org.junit.Test;
 /**
  * @author Mario Macias (http://github.com/mariomac)
  */
+@Ignore
 public class TestStandaloneServer {
 
 	static Server server;
