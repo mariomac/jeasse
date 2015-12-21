@@ -50,9 +50,9 @@ public class SseBroadcaster {
 	 * @param messageEvent The instance that encapsulates all the desired fields for the {@link MessageEvent}
 	 */
 	public void broadcast(MessageEvent messageEvent) {
-		Set<SseDispatcher> disp;
+		SseDispatcher[] disp;
 		synchronized (dispatchers) {
-			disp = Collections.unmodifiableSet(dispatchers);
+			disp = dispatchers.toArray(new SseDispatcher[dispatchers.size()]);
 		}
 		for(SseDispatcher dispatcher : disp) {
 			try {
@@ -69,9 +69,10 @@ public class SseBroadcaster {
 	 * collection of subscribers.
 	 */
 	public void close() {
-		Set<SseDispatcher> disp;
+		SseDispatcher[] disp;
 		synchronized (dispatchers) {
-			disp = Collections.unmodifiableSet(dispatchers);
+			disp = dispatchers.toArray(new SseDispatcher[dispatchers.size()]);
+
 			for(SseDispatcher d : disp) {
 				try {
 					d.close();
@@ -79,7 +80,7 @@ public class SseBroadcaster {
 					// Uncontrolled exception when closing a dispatcher. Removing anyway and ignoring.
 				}
 			}
-			disp.clear();
+			dispatchers.clear();
 		}
 	}
 }

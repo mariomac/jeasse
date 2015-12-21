@@ -12,6 +12,7 @@ Features:
 
 Usage example:
 
+	@WebServlet(asyncSupported = true)
 	public class TestServlet extends HttpServlet {
 	
 		SseBroadcaster broadcaster = new SseBroadcaster();

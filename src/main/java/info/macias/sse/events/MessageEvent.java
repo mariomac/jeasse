@@ -133,7 +133,10 @@ public class MessageEvent {
          * @return the {@link MessageEvent} instance
          */
         public MessageEvent build() {
-            StringBuilder sb = new StringBuilder("event: ").append(event.replace("\n","")).append('\n');
+            StringBuilder sb = new StringBuilder();
+            if(event != null) {
+                sb.append("event: ").append(event.replace("\n", "")).append('\n');
+            }
             if(data != null) {
                 for(String s : data.split("\n")) {
                     sb.append("data: ").append(s).append('\n');
