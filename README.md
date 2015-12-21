@@ -5,8 +5,10 @@ Features:
 
 * Minimal footprint
 * Easily integrable with plain HTTP servlets
-* Broadcaster that automatically detaches listeners
-* Asynchronous servlet support through Servlet 3.0
+	- Asynchronous servlet support through Servlet 3.0
+* Broadcaster that automatically detaches subscriptors
+	- Thread-safe management of subscriptors
+
 
 Usage example:
 
@@ -17,7 +19,7 @@ Usage example:
 		// Attaches a listener
 		@Override
       protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-          broadcaster.addListener(req);
+          broadcaster.addSubscriptor(req);
       }
 	
 	   // Broadcasts a message to all the listeners

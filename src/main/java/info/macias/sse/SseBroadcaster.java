@@ -7,15 +7,32 @@ import java.io.IOException;
 import java.util.*;
 
 /**
+ * This class implements a one-to-many connection for broadcasting messages across multiple subscribers.
+ *
  * @author <a href="http://github.com/mariomac">Mario Macías</a>
  */
 public class SseBroadcaster {
-	private Set<SseDispatcher> dispatchers = new HashSet<>();
+	private Set<SseDispatcher> dispatchers = Collections.synchronizedSet(new HashSet<SseDispatcher>());
 
-	public void addListener(HttpServletRequest req) throws IOException {
+	/**
+	 * Adds a subscriptor to the broadcaster from a  {@link HttpServletRequest} reference.
+	 * @param req The {@link HttpServletRequest} reference, as sent by the subscriptor.
+	 * @throws IOException if there was an error during the acknowledge process between broadcaster and subscriptor
+     */
+	public void addSubscriptor(HttpServletRequest req) throws IOException {
 		dispatchers.add(new SseDispatcher(req).ok().open());
 	}
 
+	/**
+	 * Broadcasts a {@link MessageEvent} to all the subscriptors, containing only 'event' and 'data' fields.
+	 * <p/>
+	 * This method relies on the {@link SseDispatcher#send(MessageEvent)} method. If this method throws an
+	 * {@link IOException}, the broadcaster assumes the subscriptor went offline and silently detaches it
+	 * from the collection of subscriptors.
+	 *
+	 * @param event The descriptor of the 'event' field.
+	 * @param data The content of the 'data' field.
+	 */
 	public void broadcast(String event, String data) {
 		broadcast(new MessageEvent.Builder()
 				.setEvent(event)
@@ -23,16 +40,46 @@ public class SseBroadcaster {
 				.build());
 	}
 
-	public void broadcast(MessageEvent me) {
-		System.out.println("dispatchers.size() = " + dispatchers.size());
-		for(SseDispatcher dispatcher : Collections.unmodifiableSet(dispatchers)) {
+	/**
+	 * Broadcasts a {@link MessageEvent} to the subscriptors.
+	 * <p/>
+	 * This method relies on the {@link SseDispatcher#send(MessageEvent)} method. If this method throws an
+	 * {@link IOException}, the broadcaster assumes the subscriptor went offline and silently detaches it
+	 * from the collection of subscriptors.
+	 *
+	 * @param messageEvent The instance that encapsulates all the desired fields for the {@link MessageEvent}
+	 */
+	public void broadcast(MessageEvent messageEvent) {
+		Set<SseDispatcher> disp;
+		synchronized (dispatchers) {
+			disp = Collections.unmodifiableSet(dispatchers);
+		}
+		for(SseDispatcher dispatcher : disp) {
 			try {
-				System.out.println("dispatcher = " + dispatcher);
-				dispatcher.send(me);
+				dispatcher.send(messageEvent);
 			} catch (IOException e) {
 				// Client disconnected. Removing from dispatchers
 				dispatchers.remove(dispatcher);
 			}
+		}
+	}
+
+	/**
+	 * Closes all the connections between the broadcaster and the subscriptors, and detaches all of them from the
+	 * collection of subscriptors.
+	 */
+	public void close() {
+		Set<SseDispatcher> disp;
+		synchronized (dispatchers) {
+			disp = Collections.unmodifiableSet(dispatchers);
+			for(SseDispatcher d : disp) {
+				try {
+					d.close();
+				} catch (Exception e) {
+					// Uncontrolled exception when closing a dispatcher. Removing anyway and ignoring.
+				}
+			}
+			disp.clear();
 		}
 	}
 }

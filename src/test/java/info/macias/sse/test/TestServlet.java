@@ -1,7 +1,6 @@
 package info.macias.sse.test;
 
 import info.macias.sse.SseBroadcaster;
-import info.macias.sse.SseDispatcher;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -10,8 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Scanner;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * @author Mario Macías (http://github.com/mariomac)
@@ -35,6 +32,12 @@ public class TestServlet extends HttpServlet {
 	//http://cjihrig.com/blog/the-server-side-of-server-sent-events/
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        broadcaster.addListener(req);
+        broadcaster.addSubscriptor(req);
     }
+
+	@Override
+	public void destroy() {
+		broadcaster.close();
+		super.destroy();
+	}
 }
