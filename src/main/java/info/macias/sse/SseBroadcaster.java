@@ -15,20 +15,20 @@ public class SseBroadcaster {
 	private Set<SseDispatcher> dispatchers = Collections.synchronizedSet(new HashSet<SseDispatcher>());
 
 	/**
-	 * Adds a subscriptor to the broadcaster from a  {@link HttpServletRequest} reference.
-	 * @param req The {@link HttpServletRequest} reference, as sent by the subscriptor.
-	 * @throws IOException if there was an error during the acknowledge process between broadcaster and subscriptor
+	 * Adds a subscriber to the broadcaster from a  {@link HttpServletRequest} reference.
+	 * @param req The {@link HttpServletRequest} reference, as sent by the subscribers.
+	 * @throws IOException if there was an error during the acknowledge process between broadcaster and subscriber
      */
-	public void addSubscriptor(HttpServletRequest req) throws IOException {
+	public void addSubscriber(HttpServletRequest req) throws IOException {
 		dispatchers.add(new SseDispatcher(req).ok().open());
 	}
 
 	/**
-	 * Broadcasts a {@link MessageEvent} to all the subscriptors, containing only 'event' and 'data' fields.
+	 * Broadcasts a {@link MessageEvent} to all the subscribers, containing only 'event' and 'data' fields.
 	 * <p/>
 	 * This method relies on the {@link SseDispatcher#send(MessageEvent)} method. If this method throws an
-	 * {@link IOException}, the broadcaster assumes the subscriptor went offline and silently detaches it
-	 * from the collection of subscriptors.
+	 * {@link IOException}, the broadcaster assumes the subscriber went offline and silently detaches it
+	 * from the collection of subscribers.
 	 *
 	 * @param event The descriptor of the 'event' field.
 	 * @param data The content of the 'data' field.
@@ -41,11 +41,11 @@ public class SseBroadcaster {
 	}
 
 	/**
-	 * Broadcasts a {@link MessageEvent} to the subscriptors.
+	 * Broadcasts a {@link MessageEvent} to the subscribers.
 	 * <p/>
 	 * This method relies on the {@link SseDispatcher#send(MessageEvent)} method. If this method throws an
-	 * {@link IOException}, the broadcaster assumes the subscriptor went offline and silently detaches it
-	 * from the collection of subscriptors.
+	 * {@link IOException}, the broadcaster assumes the subscriber went offline and silently detaches it
+	 * from the collection of subscribers.
 	 *
 	 * @param messageEvent The instance that encapsulates all the desired fields for the {@link MessageEvent}
 	 */
@@ -65,8 +65,8 @@ public class SseBroadcaster {
 	}
 
 	/**
-	 * Closes all the connections between the broadcaster and the subscriptors, and detaches all of them from the
-	 * collection of subscriptors.
+	 * Closes all the connections between the broadcaster and the subscribers, and detaches all of them from the
+	 * collection of subscribers.
 	 */
 	public void close() {
 		Set<SseDispatcher> disp;

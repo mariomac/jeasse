@@ -32,7 +32,7 @@ public class TestServlet extends HttpServlet {
 	//http://cjihrig.com/blog/the-server-side-of-server-sent-events/
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        broadcaster.addSubscriptor(req);
+        broadcaster.addSubscriber(req);
     }
 
 	@Override
