@@ -1,6 +1,6 @@
 # jEaSSE
 
-Java Easy SSE (Server-Side Events) implementation
+Java Easy SSE (Server-Sent Events) implementation (at server side).
 
 Features:
 
@@ -64,3 +64,11 @@ Subscription to broadcast messages, with individial welcome message (MessageEven
 	    MessageEvent welcome = new MessageEvent.Builder().setData("Welcome to the broadcasting service").build();
 		broadcaster.addSubscriber(req,welcome);
 	}   
+
+## Client-side libraries
+
+At the moment I do not provide any client-side library. You can use other cool libraries:
+
+* [Jersey's EventInput](https://jersey.java.net/documentation/latest/sse.html#d0e11869)
+* [Javascript's EventSource](https://html.spec.whatwg.org/multipage/comms.html#server-sent-events) (Enabled by default in all browsers excepting Internet Explorer/MS Edge)
+	- Implementations for Internet Explorer (https://github.com/remy/polyfills/blob/master/EventSource.js) (https://github.com/amvtek/EventSource) (https://github.com/remy/polyfills/blob/master/EventSource.js)
