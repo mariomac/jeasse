@@ -4,7 +4,7 @@ Java Easy SSE (Server-Sent Events) implementation (at server side).
 
 Features:
 
-* Minimal footprint: 3 classes. No external dependencies.
+* Minimal footprint: minimal number classes. No 3rd-party dependencies.
 * Easily integrable with plain HTTP servlets (see below examples)
 * Asynchronous servlet operation: don't spend your server threads.
 * Broadcasting mode with automatic, thread-safe management of subscribers
