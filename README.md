@@ -10,6 +10,13 @@ Features:
 * Broadcaster that automatically detaches subscribers
 	- Thread-safe management of subscribers
 
+## Maven coordinates
+	<dependency>
+		<groupId>info.macias</groupId>
+		<artifactId>jeasse</artifactId>
+		<version>0.9.0</version>
+	</dependency>
+
 ## Usage examples
 
 Basic, one-to-one subscription:
