@@ -4,11 +4,10 @@ Java Easy SSE (Server-Sent Events) implementation (at server side).
 
 Features:
 
-* Minimal footprint
-* Easily integrable with plain HTTP servlets
-	- Asynchronous servlet support through Servlet 3.0
-* Broadcaster that automatically detaches subscribers
-	- Thread-safe management of subscribers
+* Minimal footprint: 3 classes. No external dependencies.
+* Easily integrable with plain HTTP servlets (see below examples)
+* Asynchronous servlet operation: don't spend your server threads.
+* Broadcasting mode with automatic, thread-safe management of subscribers
 
 ## Maven coordinates
 	<dependency>
