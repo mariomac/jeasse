@@ -17,10 +17,34 @@ public class SseBroadcaster {
 	/**
 	 * Adds a subscriber to the broadcaster from a  {@link HttpServletRequest} reference.
 	 * @param req The {@link HttpServletRequest} reference, as sent by the subscribers.
+	 * @return the {@link SseDispatcher} object that will be used to communicate with the recently created subscriber
 	 * @throws IOException if there was an error during the acknowledge process between broadcaster and subscriber
      */
-	public void addSubscriber(HttpServletRequest req) throws IOException {
-		dispatchers.add(new SseDispatcher(req).ok().open());
+	public SseDispatcher addSubscriber(HttpServletRequest req) throws IOException {
+		SseDispatcher dispatcher = null;
+		synchronized (dispatchers) {
+			dispatcher = new SseDispatcher(req).ok().open();
+			dispatchers.add(dispatcher);
+		}
+		return dispatcher;
+	}
+
+	/**
+	 * Adds a subscriber to the broadcaster from a  {@link HttpServletRequest} reference. After the connection has been
+	 * successfully established, the broadcaster sends a welcome message exclusively to this subscriber.
+	 * @param req The {@link HttpServletRequest} reference, as sent by the subscribers.
+	 * @param welcomeMessage The welcome message
+	 * @return the {@link SseDispatcher} object that will be used to communicate with the recently created subscriber
+	 * @throws IOException if there was an error during the acknowledge process between broadcaster and subscriber, or
+	 *         if the subscriber immediately closed the connection before receiving the welcome message
+	 */
+	public SseDispatcher addSubscriber(HttpServletRequest req, MessageEvent welcomeMessage) throws IOException {
+		SseDispatcher dispatcher = null;
+		synchronized (dispatchers) {
+			dispatcher = new SseDispatcher(req).ok().open().send(welcomeMessage);
+			dispatchers.add(dispatcher);
+		}
+		return dispatcher;
 	}
 
 	/**
