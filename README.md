@@ -12,8 +12,16 @@ Features:
 ## Maven coordinates
 	<dependency>
 		<groupId>info.macias</groupId>
-		<artifactId>jeasse</artifactId>
-		<version>0.9.0</version>
+		<artifactId>jeasse-servlet3</artifactId>
+		<version>0.9.1</version>
+	</dependency>
+	
+You also need to include Java Servlet API > 3
+
+	<dependency>
+		<groupId>javax.servlet</groupId>
+		<artifactId>javax.servlet-api</artifactId>
+		<version>[3.0.1,)</version>
 	</dependency>
 
 ## Usage examples

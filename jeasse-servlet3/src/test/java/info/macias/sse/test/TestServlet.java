@@ -1,6 +1,6 @@
 package info.macias.sse.test;
 
-import info.macias.sse.SseBroadcaster;
+import info.macias.sse.ServletSseBroadcaster;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,7 +16,7 @@ import java.util.Scanner;
 @WebServlet(asyncSupported = true)
 public class TestServlet extends HttpServlet {
 
-	SseBroadcaster broadcaster = new SseBroadcaster();
+	ServletSseBroadcaster broadcaster = new ServletSseBroadcaster();
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

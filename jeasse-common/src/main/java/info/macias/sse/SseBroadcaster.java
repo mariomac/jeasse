@@ -2,50 +2,55 @@ package info.macias.sse;
 
 import info.macias.sse.events.MessageEvent;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This class implements a one-to-many connection for broadcasting messages across multiple subscribers.
  *
+ * @param <ConnectionClass> class that contains the information to allow sending back
+ * information to the subsbriber (e.g. an <code>HttpServletRequest</code> for servlets or <code>HttpServerRequest</code>
+ * for VertX)
+ *
  * @author <a href="http://github.com/mariomac">Mario Macías</a>
  */
-public class SseBroadcaster {
-	private Set<SseDispatcher> dispatchers = Collections.synchronizedSet(new HashSet<SseDispatcher>());
+public abstract class SseBroadcaster<ConnectionClass> {
+
+	protected Set<SseDispatcher> dispatchers = Collections.synchronizedSet(new HashSet<>());
 
 	/**
-	 * Adds a subscriber to the broadcaster from a  {@link HttpServletRequest} reference.
-	 * @param req The {@link HttpServletRequest} reference, as sent by the subscribers.
-	 * @return the {@link SseDispatcher} object that will be used to communicate with the recently created subscriber
+	 * Adds a subscriber from a <code>connectionRequest</code> that contains the information to allow sending back
+	 * information to the subsbriber (e.g. an <code>HttpServletRequest</code> for servlets or <code>HttpServerRequest</code>
+	 * for VertX)<p/>
+	 *
+	 * The implementors of this class, must call the {@link SseDispatcher#ok()} and then the {@link SseDispatcher#open()} method
+	 *
+	 * @param connectionRequest a connection request, as sent by the subscribers
+	 * for VertX)
+	 * @return the {@link SseDispatcher} implementing object that will be used to communicate with the recently created subscriber
 	 * @throws IOException if there was an error during the acknowledge process between broadcaster and subscriber
-     */
-	public SseDispatcher addSubscriber(HttpServletRequest req) throws IOException {
-		SseDispatcher dispatcher = null;
-		synchronized (dispatchers) {
-			dispatcher = new SseDispatcher(req).ok().open();
-			dispatchers.add(dispatcher);
-		}
-		return dispatcher;
-	}
+	 */
+	public abstract SseDispatcher addSubscriber(ConnectionClass connectionRequest) throws IOException;
 
 	/**
-	 * Adds a subscriber to the broadcaster from a  {@link HttpServletRequest} reference. After the connection has been
+	 * Adds a subscriber to the broadcaster from a <code>connectionRequest</code> reference that contains the information to allow sending back
+	 * information to the subsbriber (e.g. an <code>HttpServletRequest</code> for servlets or <code>HttpServerRequest</code>
+	 * for VertX).<p/>
+	 *
+	 * The implementors of this class, must call the {@link SseDispatcher#ok()} and then the {@link SseDispatcher#open()} method.
+	 * After the connection has been
 	 * successfully established, the broadcaster sends a welcome message exclusively to this subscriber.
-	 * @param req The {@link HttpServletRequest} reference, as sent by the subscribers.
+	 *
+	 *
+	 * @param connectionRequest The connection request reference, as sent by the subscribers.
 	 * @param welcomeMessage The welcome message
-	 * @return the {@link SseDispatcher} object that will be used to communicate with the recently created subscriber
+	 * @return the {@link SseDispatcher} implementing object that will be used to communicate with the recently created subscriber
 	 * @throws IOException if there was an error during the acknowledge process between broadcaster and subscriber, or
 	 *         if the subscriber immediately closed the connection before receiving the welcome message
 	 */
-	public SseDispatcher addSubscriber(HttpServletRequest req, MessageEvent welcomeMessage) throws IOException {
-		SseDispatcher dispatcher = null;
-		synchronized (dispatchers) {
-			dispatcher = new SseDispatcher(req).ok().open().send(welcomeMessage);
-			dispatchers.add(dispatcher);
-		}
-		return dispatcher;
-	}
+	public abstract SseDispatcher addSubscriber(ConnectionClass connectionRequest, MessageEvent welcomeMessage) throws IOException;
 
 	/**
 	 * <p>Broadcasts a {@link MessageEvent} to all the subscribers, containing only 'event' and 'data' fields.</p>
@@ -108,3 +113,4 @@ public class SseBroadcaster {
 		}
 	}
 }
+
