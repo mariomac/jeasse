@@ -11,14 +11,16 @@ Features:
 
 ## Maven coordinates
 
-### For Servlet > 3.0 version
+### For Servlet >= 3.0 version
     <dependency>
         <groupId>info.macias</groupId>
         <artifactId>jeasse-servlet3</artifactId>
         <version>0.10.0</version>
     </dependency>
+    
+(You also need to provide the `servlet-api` [3.0.1,) dependencies)
 
-### For Vertx Version
+### For Vertx >= 3.1 Version
 
     <dependency>
         <groupId>info.macias</groupId>
@@ -26,9 +28,11 @@ Features:
         <version>0.10.0</version>
     </dependency>
 
+(You also need to provide `vertx-core` and `vertx-web` [3.1.0,) dependencies.
+
 ## Usage examples
 
-### For Servlet > 3.0
+### For Servlet >= 3.0
 Basic, one-to-one subscription:
 
 	@WebServlet(asyncSupported = true)
@@ -75,7 +79,7 @@ Subscription to broadcast messages, with individial welcome message (MessageEven
 		broadcaster.addSubscriber(new ServletEventTarget(req),welcome);
 	}
 
-### For Vertx 3
+### For Vertx >= 3.1
 
 Basic, one-to-one subscription:
 
