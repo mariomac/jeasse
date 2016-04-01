@@ -34,6 +34,14 @@ import java.util.Scanner;
 public class ChatServlet extends HttpServlet {
     EventBroadcast broadcaster = new EventBroadcast();
 
+    // When somebody asks to be connected to the chat servlet, it welcomes it and adds to the list of subscribers
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        broadcaster.addSubscriber(new ServletEventTarget(req),
+                new MessageEvent.Builder().setData("*** Welcome to the chat server ***").build());
+    }
+
+    // When somebody posts a message, it broadcasts it to all its subscribers
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Scanner scanner = new Scanner(req.getInputStream());
@@ -42,24 +50,17 @@ public class ChatServlet extends HttpServlet {
             sb.append(scanner.nextLine());
         }
         // dirty json parsing
-        String json = sb.toString();
-        System.out.println("Received: " + json);
-        broadcaster.broadcast("message", dirtyJsonParse(json));
+        broadcaster.broadcast("message", dirtyJsonParse(sb.toString()));
     }
 
-    //http://cjihrig.com/blog/the-server-side-of-server-sent-events/
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        broadcaster.addSubscriber(new ServletEventTarget(req),
-                new MessageEvent.Builder().setData("*** Welcome to the chat server ***").build());
-    }
-
+    // When the servlet is destroyed, it closes all the broadcast subscribers
     @Override
     public void destroy() {
         broadcaster.close();
         super.destroy();
     }
 
+    // Dirty aux function
     private static String dirtyJsonParse(String json) {
         String senderChunk = "\"sender\":\"";
         String messageChunk = "\"message\":\"";

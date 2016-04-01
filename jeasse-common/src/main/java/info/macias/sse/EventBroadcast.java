@@ -56,7 +56,6 @@ public class EventBroadcast {
 	 *
 	 * @param eventTarget an event target to be subscribed to the broadcast messages
 	 * @param welcomeMessage The welcome message
-	 * @return the {@link EventTarget} implementing object that will be used to communicate with the recently created subscriber
 	 * @throws IOException if there was an error during the acknowledge process between broadcaster and subscriber, or
 	 *         if the subscriber immediately closed the connection before receiving the welcome message
 	 */

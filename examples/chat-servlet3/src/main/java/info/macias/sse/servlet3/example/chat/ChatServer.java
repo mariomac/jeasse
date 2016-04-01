@@ -22,13 +22,20 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.util.resource.Resource;
 
+/**
+ * @author Mario Macías (http://github.com/mariomac)
+ */
 public class ChatServer {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        // Prepare jetty to serve static files and setup the Chat Servlet
+
         final Server server = new Server(8080);
         ResourceHandler resourceHandler = new ResourceHandler();
         resourceHandler.setWelcomeFiles(new String[] {"index.html"});
-        resourceHandler.setResourceBase(ChatServer.class.getResource("/").toExternalForm());
+
+        resourceHandler.setResourceBase(Resource.newClassPathResource("/static").getURI().toURL().toExternalForm());
         resourceHandler.setDirectoriesListed(true);
 
         ContextHandler resourceCtxHandler = new ContextHandler("/");
@@ -54,7 +61,6 @@ public class ChatServer {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                System.out.println("Stopping jetty");
                 try {
                     server.stop();
                 } catch (Exception e) {
