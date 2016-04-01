@@ -1,5 +1,22 @@
-package info.macias.sse;
+/*
+Copyright 2016 - Mario Macias Lloret
 
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+package info.macias.sse.servlet3;
+
+import info.macias.sse.EventTarget;
 import info.macias.sse.events.MessageEvent;
 
 import javax.servlet.AsyncContext;
@@ -14,7 +31,7 @@ import java.io.IOException;
  *
  * @author <a href="http://github.com/mariomac">Mario Macías</a>
  */
-public class ServletSseDispatcher implements SseDispatcher {
+public class ServletEventTarget implements EventTarget {
 
 	private final AsyncContext asyncContext;
 
@@ -22,7 +39,7 @@ public class ServletSseDispatcher implements SseDispatcher {
      * Builds a new dispatcher from an {@link HttpServletRequest} object.
      * @param request The {@link HttpServletRequest} reference, as sent by the subscriber.
      */
-    public ServletSseDispatcher(HttpServletRequest request) {
+    public ServletEventTarget(HttpServletRequest request) {
         asyncContext = request.startAsync();
         asyncContext.setTimeout(0);
         asyncContext.addListener(new AsyncListenerImpl());
@@ -35,10 +52,10 @@ public class ServletSseDispatcher implements SseDispatcher {
      *     Cache-Control: no-cache
      *     Connection: keep-alive
      * </pre>
-     * @return The same {@link ServletSseDispatcher} object that received the method call
+     * @return The same {@link ServletEventTarget} object that received the method call
      */
 	@Override
-    public ServletSseDispatcher ok() {
+    public ServletEventTarget ok() {
         HttpServletResponse response = (HttpServletResponse)asyncContext.getResponse();
         response.setStatus(200);
         response.setContentType("text/event-stream");
@@ -51,12 +68,12 @@ public class ServletSseDispatcher implements SseDispatcher {
     /**
      * Responds to the client-side subscriber that the connection has been open
      *
-     * @return The same {@link ServletSseDispatcher} object that received the method call
+     * @return The same {@link ServletEventTarget} object that received the method call
      * @throws IOException if there was an error writing into the response's {@link java.io.OutputStream}. This may be
      * a common exception: e.g. it will be thrown when the SSE subscriber closes the connection
      */
 	@Override
-    public ServletSseDispatcher open() throws IOException {
+    public ServletEventTarget open() throws IOException {
         HttpServletResponse response = (HttpServletResponse)asyncContext.getResponse();
         response.getOutputStream().print("event: open\n\n");
         response.getOutputStream().flush();
@@ -68,12 +85,12 @@ public class ServletSseDispatcher implements SseDispatcher {
      * Sends a {@link MessageEvent} to the subscriber, containing only 'event' and 'data' fields.
      * @param event The descriptor of the 'event' field.
      * @param data The content of the 'data' field.
-     * @return The same {@link ServletSseDispatcher} object that received the method call
+     * @return The same {@link ServletEventTarget} object that received the method call
      * @throws IOException if there was an error writing into the response's {@link java.io.OutputStream}. This may be
      * a common exception: e.g. it will be thrown when the SSE subscriber closes the connection
      */
 	@Override
-    public ServletSseDispatcher send(String event, String data) throws IOException {
+    public ServletEventTarget send(String event, String data) throws IOException {
         HttpServletResponse response = (HttpServletResponse)asyncContext.getResponse();
         response.getOutputStream().print(
                 new MessageEvent.Builder()
@@ -89,12 +106,12 @@ public class ServletSseDispatcher implements SseDispatcher {
     /**
      * Sends a {@link MessageEvent} to the subscriber
      * @param messageEvent The instance that encapsulates all the desired fields for the {@link MessageEvent}
-     * @return The same {@link ServletSseDispatcher} object that received the method call
+     * @return The same {@link ServletEventTarget} object that received the method call
      * @throws IOException if there was an error writing into the response's {@link java.io.OutputStream}. This may be
      * a common exception: e.g. it will be thrown when the SSE subscriber closes the connection
      */
 	@Override
-    public ServletSseDispatcher send(MessageEvent messageEvent) throws IOException {
+    public ServletEventTarget send(MessageEvent messageEvent) throws IOException {
 		HttpServletResponse response = (HttpServletResponse)asyncContext.getResponse();
         response.getOutputStream().print(messageEvent.toString());
 		response.getOutputStream().flush();

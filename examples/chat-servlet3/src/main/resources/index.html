@@ -1,0 +1,149 @@
+<!--
+Copyright 2016 - Mario Macias Lloret
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!-- Event source polyfill for Internet Explorer compatibility -->
+    <script src="eventsource.min.js"></script>
+    <style>
+        body {
+            background: gray;
+        }
+
+        h1 {
+            font-family: sans-serif;
+            text-align: center;
+        }
+
+        #frame {
+            padding: 20px;
+        }
+
+        #console {
+            font-family: "Comic Sans MS", sans-serif;
+            font-size: 16px;
+            border: solid black 1px;
+            background: white;
+            left: 0px;
+            right: 0px;
+            overflow: scroll;
+            height: 400px;
+            margin: 0px;
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+
+        #input * {
+            font-family: "Comic Sans MS", sans-serif;
+            font-size: 16px;
+        }
+        #input input {
+            padding: 10px;
+            border: solid 1px #dcdcdc;
+            transition: box-shadow 0.3s, border 0.3s;
+        }
+        #input input:focus,
+        #input input.focus {
+            border: solid 1px #707070;
+            box-shadow: 0 0 5px 1px #969696;
+        }
+        #input {
+            display: flex;
+        }
+        #input #name {
+            float:left;
+        }
+        #input #message {
+            flex: 2;
+            margin-left: 5px;
+
+        }
+        #input #submit {
+            float:right;
+        }
+        #input button {
+            padding: 10px;
+            border: solid 1px black;
+        }
+    </style>
+</head>
+<body>
+<h1>Chat app</h1>
+<div id="frame">
+    <div id="console">
+
+    </div>
+    <div id="input">
+        <input id="sender" name="sender" placeholder="Your name here"/>
+        <input id="message" name="message" placeholder="Write a message and put intro to submit"/>
+        <button id="submit" onclick="submitMsg()">Submit!</button>
+    </div>
+</div>
+<script>
+    var sender = document.getElementById("sender");
+    var message = document.getElementById("message");
+    var submit = document.getElementById("submit");
+    console.log(sender);
+    console.log(message);
+    console.log(submit);
+
+    function submitMsg() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/send", true);
+        xhr.send(JSON.stringify({sender:sender.value,message:message.value}));
+        message.value="";
+    }
+    message.onkeydown = function(key) {
+        if(key.keyCode == 13) {
+            submitMsg();
+        }
+    }
+
+    function print(message) {
+        message = message.replace(/\n/g, "<br/>")
+        message = message.replace(/\s/g, "&nbsp;")
+        var element = document.getElementById("console");
+        element.innerHTML += message + "<br/>";
+        element.scrollTop = element.scrollHeight;
+    }
+    var source;
+    if (!!window.EventSource) {
+        source = new EventSource('/send');
+    } else {
+        print("YOUR BROWSER DOES NOT SUPPORT SSE");
+    }
+    source.addEventListener('message', function (e) {
+        print("" + e.data);
+    }, false);
+
+    source.addEventListener('open', function (e) {
+        print("Connecting to the chat server...");
+        // Connection was opened.
+    }, false);
+
+    source.addEventListener('error', function (e) {
+        if (e.readyState == EventSource.CLOSED) {
+            print("**** ERROR: " + e);
+        }
+    }, false);
+
+</script>
+</body>
+</html>

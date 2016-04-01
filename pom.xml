@@ -6,10 +6,10 @@
     <groupId>info.macias</groupId>
     <artifactId>jeasse-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.9.1</version>
+    <version>0.10.0</version>
 	<url>http://github.com/mariomac/jeasse</url>
 
-    <name>jEASSE: Java Easy Server-Side Events</name>
+    <name>jEaSSE: Java Easy Server-Sent Events</name>
     <description>Implementation of SSE for Java plain Servlets with minimal footprint and asynchronous processing.</description>
 
     <licenses>
@@ -25,16 +25,28 @@
             <url>http://macias.info</url>
         </developer>
     </developers>
-
     <scm>
         <connection>scm:git:git@github.com:mariomac/jeasse.git</connection>
         <developerConnection>scm:git:git@github.com:mariomac/jeasse.git</developerConnection>
         <url>git@github.com:mariomac/jeasse.git</url>
     </scm>
-
 	<modules>
 		<module>jeasse-common</module>
 		<module>jeasse-servlet3</module>
 		<module>jeasse-vertx3</module>
+        <module>examples</module>
 	</modules>
+
+     <!--mvn source:jar javadoc:jar repository:bundle-create -P bundle-->
+    <!--And drop the bundle in https://oss.sonatype.org/#staging-upload-->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-repository-plugin</artifactId>
+                <version>2.4</version>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>

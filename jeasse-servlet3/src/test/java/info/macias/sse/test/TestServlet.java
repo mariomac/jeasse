@@ -1,6 +1,23 @@
+/*
+Copyright 2016 - Mario Macias Lloret
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package info.macias.sse.test;
 
-import info.macias.sse.ServletSseBroadcaster;
+import info.macias.sse.EventBroadcast;
+import info.macias.sse.servlet3.ServletEventTarget;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,7 +33,7 @@ import java.util.Scanner;
 @WebServlet(asyncSupported = true)
 public class TestServlet extends HttpServlet {
 
-	ServletSseBroadcaster broadcaster = new ServletSseBroadcaster();
+	EventBroadcast broadcaster = new EventBroadcast();
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -32,7 +49,7 @@ public class TestServlet extends HttpServlet {
 	//http://cjihrig.com/blog/the-server-side-of-server-sent-events/
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        broadcaster.addSubscriber(req);
+        broadcaster.addSubscriber(new ServletEventTarget(req));
     }
 
 	@Override

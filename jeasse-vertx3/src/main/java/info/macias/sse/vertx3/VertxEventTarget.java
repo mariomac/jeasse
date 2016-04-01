@@ -1,9 +1,24 @@
-package info.macias.sse;
+/*
+Copyright 2016 - Mario Macias Lloret
 
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+package info.macias.sse.vertx3;
+
+import info.macias.sse.EventTarget;
 import info.macias.sse.events.MessageEvent;
-import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.http.HttpServerResponse;
 
 import java.io.IOException;
 
@@ -12,7 +27,7 @@ import java.io.IOException;
  *
  * @author <a href="http://github.com/mariomac">Mario Macías</a>
  */
-public class VertxSseDispatcher implements SseDispatcher {
+public class VertxEventTarget implements EventTarget {
 
 	private HttpServerRequest request;
 
@@ -20,7 +35,7 @@ public class VertxSseDispatcher implements SseDispatcher {
      * Builds a new dispatcher from an {@link HttpServerRequest} object.
      * @param request The {@link HttpServerRequest} reference, as sent by the subscriber.
      */
-    public VertxSseDispatcher(HttpServerRequest request) {
+    public VertxEventTarget(HttpServerRequest request) {
 		this.request = request;
     }
 
@@ -31,10 +46,10 @@ public class VertxSseDispatcher implements SseDispatcher {
      *     Cache-Control: no-cache
      *     Connection: keep-alive
      * </pre>
-     * @return The same {@link VertxSseDispatcher} object that received the method call
+     * @return The same {@link VertxEventTarget} object that received the method call
      */
 	@Override
-    public VertxSseDispatcher ok() {
+    public VertxEventTarget ok() {
 		request.response().headers().add("Content-Type", "text/event-stream");
 		request.response().headers().add("Cache-Control", "no-cache");
 		request.response().headers().add("Connection", "keep-alive");
@@ -46,12 +61,12 @@ public class VertxSseDispatcher implements SseDispatcher {
     /**
      * Responds to the client-side subscriber that the connection has been open
      *
-     * @return The same {@link VertxSseDispatcher} object that received the method call
+     * @return The same {@link VertxEventTarget} object that received the method call
      * @throws IOException if there was an error writing into the response's {@link java.io.OutputStream}. This may be
      * a common exception: e.g. it will be thrown when the SSE subscriber closes the connection
      */
 	@Override
-    public VertxSseDispatcher open() throws IOException {
+    public VertxEventTarget open() throws IOException {
 		System.out.println("request.version() = " + request.version());
 		System.out.println("Sending event open");
 		request.response().write("event: open\n\n");
@@ -62,12 +77,12 @@ public class VertxSseDispatcher implements SseDispatcher {
      * Sends a {@link MessageEvent} to the subscriber, containing only 'event' and 'data' fields.
      * @param event The descriptor of the 'event' field.
      * @param data The content of the 'data' field.
-     * @return The same {@link VertxSseDispatcher} object that received the method call
+     * @return The same {@link VertxEventTarget} object that received the method call
      * @throws IOException if there was an error writing into the response's {@link java.io.OutputStream}. This may be
      * a common exception: e.g. it will be thrown when the SSE subscriber closes the connection
      */
 	@Override
-    public VertxSseDispatcher send(String event, String data) throws IOException {
+    public VertxEventTarget send(String event, String data) throws IOException {
 		request.response().write(
                 new MessageEvent.Builder()
                     .setData(data)
@@ -81,12 +96,12 @@ public class VertxSseDispatcher implements SseDispatcher {
     /**
      * Sends a {@link MessageEvent} to the subscriber
      * @param messageEvent The instance that encapsulates all the desired fields for the {@link MessageEvent}
-     * @return The same {@link VertxSseDispatcher} object that received the method call
+     * @return The same {@link VertxEventTarget} object that received the method call
      * @throws IOException if there was an error writing into the response's {@link java.io.OutputStream}. This may be
      * a common exception: e.g. it will be thrown when the SSE subscriber closes the connection
      */
 	@Override
-    public VertxSseDispatcher send(MessageEvent messageEvent) throws IOException {
+    public VertxEventTarget send(MessageEvent messageEvent) throws IOException {
 		request.response().write(messageEvent.toString());
 
 		return this;

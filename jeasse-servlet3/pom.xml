@@ -6,72 +6,26 @@
 	<parent>
 		<groupId>info.macias</groupId>
 		<artifactId>jeasse-parent</artifactId>
-		<version>0.9.1</version>
+        <version>0.10.0</version>
 	</parent>
-	<artifactId>jeasse-servlet</artifactId>
+	<artifactId>jeasse-servlet3</artifactId>
 
 	<url>http://github.com/mariomac/jeasse</url>
 
-    <name>jEASSE: Java Easy Server-Side Events</name>
-    <description>Implementation of SSE for Java plain Servlets with minimal footprint and asynchronous processing.</description>
+	<name>jEaSSE connectors to Servlet 3.0</name>
 
     <licenses>
         <license>
-            <name>GNU LESSER GENERAL PUBLIC LICENSE Version 3</name>
-            <url>http://www.gnu.org/licenses/lgpl-3.0.html</url>
+            <name>Apache license, version 2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
         </license>
     </licenses>
-
-	<profiles>
-		<profile>
-			<id>deployment</id>
-			<distributionManagement>
-				<snapshotRepository>
-					<id>ossrh</id>
-					<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-				</snapshotRepository>
-				<repository>
-					<id>ossrh</id>
-					<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-				</repository>
-			</distributionManagement>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.6</version>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.sonatype.plugins</groupId>
-						<artifactId>nexus-staging-maven-plugin</artifactId>
-						<version>1.6.3</version>
-						<extensions>true</extensions>
-						<configuration>
-							<serverId>ossrh</serverId>
-							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-							<autoReleaseAfterClose>true</autoReleaseAfterClose>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 
     <dependencies>
 		<dependency>
 			<groupId>info.macias</groupId>
 			<artifactId>jeasse-common</artifactId>
-			<version>0.9.1</version>
+            <version>0.10.0</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>

@@ -1,0 +1,20 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>info.macias</groupId>
+        <artifactId>jeasse-parent</artifactId>
+        <version>0.10.0</version>
+    </parent>
+    <artifactId>jeasse-examples</artifactId>
+    <packaging>pom</packaging>
+
+    <description>Examples for jEaSSE</description>
+
+    <modules>
+        <module>chat-servlet3</module>
+        <module>chat-vertx3</module>
+    </modules>
+</project>
