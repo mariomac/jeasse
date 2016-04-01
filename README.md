@@ -5,41 +5,44 @@ Java Easy SSE (Server-Sent Events) implementation (at server side).
 Features:
 
 * Minimal footprint, with no 3rd-party dependencies.
-* Easily integrable with plain HTTP servlets (see below examples)
-* Asynchronous servlet operation: don't spend your server threads.
+* Easily integrable with plain HTTP servlets or Vertx verticles (see below examples)
+* Asynchronous operation: don't spend your server threads.
 * Broadcasting mode with automatic, thread-safe management of subscribers
 
 ## Maven coordinates
-	<dependency>
-		<groupId>info.macias</groupId>
-		<artifactId>jeasse</artifactId>
-		<version>0.9.0</version>
-	</dependency>
-	
-You also need to include Java Servlet API > 3
 
-	<dependency>
-		<groupId>javax.servlet</groupId>
-		<artifactId>javax.servlet-api</artifactId>
-		<version>[3.0.1,)</version>
-	</dependency>
+### For Servlet > 3.0 version
+    <dependency>
+        <groupId>info.macias</groupId>
+        <artifactId>jeasse-servlet3</artifactId>
+        <version>0.10.0</version>
+    </dependency>
+
+### For Vertx Version
+
+    <dependency>
+        <groupId>info.macias</groupId>
+        <artifactId>jeasse-vertx3</artifactId>
+        <version>0.10.0</version>
+    </dependency>
 
 ## Usage examples
 
+### For Servlet > 3.0
 Basic, one-to-one subscription:
 
 	@WebServlet(asyncSupported = true)
 	public class ExampleServlet1 extends HttpServlet {
 	
-		SseDispatcher dispatcher;;
+		EventTarget target;
 		
 		@Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-           dispatcher = new SseDispatcher(req).ok().open();
+           target = new ServletEventTarget(req).ok().open();
         }
 	
 	    public void onGivenEvent(String info) {
-	       dispatcher.send("givenEvent",info);
+	       target.send("givenEvent",info);
 	    }
 	}
 
@@ -47,14 +50,14 @@ Basic, one-to-one subscription:
 Subscription to broadcast messages:
 
 	@WebServlet(asyncSupported = true)
-	public class ExampleServlet1 extends HttpServlet {
+	public class ExampleServlet2 extends HttpServlet {
 	
-		SseBroadcaster broadcaster = new SseBroadcaster();
+		EventBroadcast broadcaster = new EventBroadcast();
 		
 		// Attaches a subscriber
 		@Override
     	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-            broadcaster.addSubscriber(req);
+            broadcaster.addSubscriber(new ServletEventTarget(req));
         }
 	
 	    // Broadcasts a message to all the subscribers
@@ -69,8 +72,54 @@ Subscription to broadcast messages, with individial welcome message (MessageEven
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 	    MessageEvent welcome = new MessageEvent.Builder().setData("Welcome to the broadcasting service").build();
-		broadcaster.addSubscriber(req,welcome);
-	}   
+		broadcaster.addSubscriber(new ServletEventTarget(req),welcome);
+	}
+
+### For Vertx 3
+
+Basic, one-to-one subscription:
+
+    Router router = Router.router(vertx);
+    EventTarget target;
+
+    router.get("/subscribe").handler(ctx -> {
+        target = new VertxEventTarget(ctx.request());
+    });
+
+    router.get("/ongivenevent").handler(ctx -> {
+       target.send("givenEvent","I inform you that I received a some event");
+    });
+
+Subscription to broadcast messages:
+
+    Router router = Router.router(vertx);
+    EventBroadcast broadcaster = new EventBroadcast();
+
+    // Subscription request
+    router.get("/subscribe").handler(ctx -> {
+        try {
+            broadcaster.addSubscriber(new VertxEventTarget(ctx.request());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    });
+
+    // Message send request
+    router.post("/msg").handler(ctx -> {
+        broadcaster.broadcast("message","broadcasting that I have received a POST message");
+    });
+
+Subscription to broadcast messages, with individial welcome message (MessageEvent API used):
+
+    router.get("/subscribe").handler(ctx -> {
+        try {
+            broadcaster.addSubscriber(new VertxEventTarget(ctx.request()),
+                    new MessageEvent.Builder().setData("Welcome to the broadcasting service").build()
+                    );
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    });
 
 ## Client-side libraries
 

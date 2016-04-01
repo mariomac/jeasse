@@ -65,7 +65,6 @@ public class ChatVerticle extends AbstractVerticle {
 				sb.append(scanner.nextLine());
 			}
 			broadcaster.broadcast("message",dirtyJsonParse(sb.toString()));
-			ctx.response().end();
 		});
 
 

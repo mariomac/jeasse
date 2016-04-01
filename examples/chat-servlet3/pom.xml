@@ -27,11 +27,6 @@
     <dependencies>
         <dependency>
             <groupId>info.macias</groupId>
-            <artifactId>jeasse-common</artifactId>
-            <version>0.10.0</version>
-        </dependency>
-        <dependency>
-            <groupId>info.macias</groupId>
             <artifactId>jeasse-servlet3</artifactId>
             <version>0.10.0</version>
         </dependency>

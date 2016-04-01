@@ -15,7 +15,7 @@ import java.io.IOException;
  *
  * @author <a href="http://github.com/mariomac">Mario Macías</a>
  *
- * @deprecated This class will be removed in version 1.0 of jEaSSE
+ * @deprecated This class will be removed in version 1.0 of jEaSSE. Use any of the implementations of {@link EventTarget}
  */
 @Deprecated
 public class SseDispatcher {

@@ -34,7 +34,7 @@
 		<module>jeasse-common</module>
 		<module>jeasse-servlet3</module>
 		<module>jeasse-vertx3</module>
-        <!--<module>examples</module>-->
+        <module>examples</module>
 	</modules>
 
      <!--mvn source:jar javadoc:jar repository:bundle-create -P bundle-->
