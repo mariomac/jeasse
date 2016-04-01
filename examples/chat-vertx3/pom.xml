@@ -32,41 +32,19 @@
         </dependency>
         <dependency>
             <groupId>info.macias</groupId>
-            <artifactId>jeasse-servlet3</artifactId>
+            <artifactId>jeasse-vertx3</artifactId>
             <version>0.10.0</version>
         </dependency>
         <dependency>
-            <groupId>info.macias</groupId>
-            <artifactId>jeasse-common</artifactId>
-            <version>0.10.0</version>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-core</artifactId>
+            <version>3.2.1</version>
         </dependency>
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>[3.0.1,)</version>
-            <scope>provided</scope>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-web</artifactId>
+            <version>3.2.1</version>
         </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <version>9.3.6.v20151106</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-rewrite</artifactId>
-            <version>9.3.6.v20151106</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-servlet</artifactId>
-            <version>9.3.6.v20151106</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.9</version>
-        </dependency>
-
     </dependencies>
 
     <build>
@@ -102,7 +80,7 @@
                                 implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                             <manifestEntries>
                                 <Main-Class>io.vertx.core.Launcher</Main-Class>
-                                <Main-Verticle>info.macias.crossovertest.AppController</Main-Verticle>
+                                <Main-Verticle>info.macias.sse.vertx3.example.chat.ChatVerticle</Main-Verticle>
                             </manifestEntries>
                         </transformer>
                     </transformers>

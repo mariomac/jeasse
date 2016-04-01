@@ -27,18 +27,12 @@
 			<artifactId>jeasse-common</artifactId>
             <version>0.10.0</version>
 		</dependency>
-		<dependency>
-			<groupId>io.vertx</groupId>
-			<artifactId>vertx-core</artifactId>
-			<version>3.2.1</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.vertx</groupId>
-			<artifactId>vertx-web</artifactId>
-			<version>3.2.1</version>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-core</artifactId>
+            <version>3.2.1</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

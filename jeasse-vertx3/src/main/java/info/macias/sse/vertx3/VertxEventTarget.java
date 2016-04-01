@@ -67,8 +67,6 @@ public class VertxEventTarget implements EventTarget {
      */
 	@Override
     public VertxEventTarget open() throws IOException {
-		System.out.println("request.version() = " + request.version());
-		System.out.println("Sending event open");
 		request.response().write("event: open\n\n");
 		return this;
     }
