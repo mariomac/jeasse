@@ -3,24 +3,25 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>info.macias</groupId>
-		<artifactId>jeasse</artifactId>
-        <version>0.10.0</version>
-	</parent>
+    <groupId>info.macias</groupId>
+    <version>0.10.0</version>
 	<artifactId>jeasse-servlet3</artifactId>
 
-	<url>http://github.com/mariomac/jeasse</url>
-
-	<name>jEaSSE connectors to Servlet 3.0</name>
-
+    <url>http://github.com/mariomac/jeasse</url>
+    <name>jEaSSE: Java Easy Server-Sent Events. Servlet 3.0 connector</name>
+	<description>jEaSSE connectors to Servlet 3.0</description>
+    <developers>
+        <developer>
+            <name>Mario Macias</name>
+            <url>http://macias.info</url>
+        </developer>
+    </developers>
     <licenses>
         <license>
             <name>Apache license, version 2</name>
             <url>http://www.apache.org/licenses/LICENSE-2.0</url>
         </license>
     </licenses>
-
     <dependencies>
 		<dependency>
 			<groupId>info.macias</groupId>
@@ -81,7 +82,6 @@
 
         </plugins>
     </build>
-
     <scm>
         <connection>scm:git:git@github.com:mariomac/jeasse.git</connection>
         <developerConnection>scm:git:git@github.com:mariomac/jeasse.git</developerConnection>
@@ -132,8 +132,4 @@
         </profile>
     </profiles>
 
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 </project>

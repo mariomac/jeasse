@@ -12,35 +12,26 @@
     <name>jEaSSE: Java Easy Server-Sent Events</name>
     <description>Implementation of SSE for Java plain Servlets with minimal footprint and asynchronous processing.</description>
 
-    <licenses>
-        <license>
-            <name>GNU LESSER GENERAL PUBLIC LICENSE Version 3</name>
-            <url>http://www.gnu.org/licenses/lgpl-3.0.html</url>
-        </license>
-    </licenses>
-
     <developers>
         <developer>
             <name>Mario Macias</name>
             <url>http://macias.info</url>
         </developer>
     </developers>
+    <licenses>
+        <license>
+            <name>Apache license, version 2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+
 	<modules>
 		<module>jeasse-common</module>
 		<module>jeasse-servlet3</module>
 		<module>jeasse-vertx3</module>
         <module>examples</module>
 	</modules>
-
-     <!--mvn source:jar javadoc:jar repository:bundle-create -P bundle-->
-    <!--And drop the bundle in https://oss.sonatype.org/#staging-upload-->
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-repository-plugin</artifactId>
-                <version>2.4</version>
-            </plugin>
-        </plugins>
-    </build>
+    <!-- To avoid deploying unwanted elements, only run this command:
+        mvn clean deploy -P deployment -pl jeasse-common,jeasse-vertx3,jeasse-servlet3
+    -->
 </project>

@@ -3,24 +3,26 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>info.macias</groupId>
-		<artifactId>jeasse</artifactId>
-        <version>0.10.0</version>
-	</parent>
-	<artifactId>jeasse-vertx3</artifactId>
+    <artifactId>jeasse-vertx3</artifactId>
+    <groupId>info.macias</groupId>
+    <version>0.10.0</version>
 
-	<url>http://github.com/mariomac/jeasse</url>
+    <url>http://github.com/mariomac/jeasse</url>
+    <name>jEaSSE: Java Easy Server-Sent Events. Vertx3 connectors</name>
+    <description>jEaSSE connectors to Vertx3</description>
 
-    <name>jEaSSE connectors to Vertx3</name>
-
-	<licenses>
-		<license>
-			<name>Apache license, version 2</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
-		</license>
-	</licenses>
-
+    <developers>
+        <developer>
+            <name>Mario Macias</name>
+            <url>http://macias.info</url>
+        </developer>
+    </developers>
+    <licenses>
+        <license>
+            <name>Apache license, version 2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
     <dependencies>
 		<dependency>
 			<groupId>info.macias</groupId>
@@ -130,8 +132,4 @@
         </profile>
     </profiles>
 
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 </project>
