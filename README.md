@@ -121,6 +121,12 @@ Subscription to broadcast messages, with individial welcome message (MessageEven
         }
     });
 
+## Example of usage
+
+To see the easiness of integration of jEaSSe, you can see a simple chat web application in the [examples](examples) folder.
+
+![Screenshot](./sshot.png)
+
 ## Client-side libraries
 
 At the moment I do not provide any client-side library. You can use other cool libraries:
