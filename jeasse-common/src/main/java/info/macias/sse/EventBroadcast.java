@@ -66,6 +66,22 @@ public class EventBroadcast {
 	}
 
 	/**
+	 * Get total count of subscribers. Actual number of active subscribers may be less that this.
+	 * @return the size of the Set holding the subscribers
+	 */
+	public int getSubscriberCount() {
+		return targets.size();
+	}
+
+	/**
+	 * Returns true if subscriber count is greater than zero
+	 * @return true if subscriber count is greater than zero
+	 */
+	public boolean hasSubscribers() {
+		return getSubscriberCount() > 0;
+	}
+
+	/**
 	 * <p>Broadcasts a {@link MessageEvent} to all the subscribers, containing only 'event' and 'data' fields.</p>
 	 *
 	 * <p>This method relies on the {@link EventTarget#send(MessageEvent)} method. If this method throws an
