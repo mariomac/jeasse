@@ -6,7 +6,7 @@
     <parent>
         <groupId>info.macias</groupId>
         <artifactId>jeasse-examples</artifactId>
-        <version>0.10.0</version>
+        <version>0.11.0</version>
     </parent>
     <artifactId>jeasse-chat-vertx3</artifactId>
     <packaging>jar</packaging>
@@ -28,7 +28,7 @@
         <dependency>
             <groupId>info.macias</groupId>
             <artifactId>jeasse-vertx3</artifactId>
-            <version>0.10.0</version>
+            <version>0.11.0</version>
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>

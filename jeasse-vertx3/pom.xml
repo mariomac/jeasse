@@ -5,7 +5,7 @@
 
     <artifactId>jeasse-vertx3</artifactId>
     <groupId>info.macias</groupId>
-    <version>0.10.0</version>
+    <version>0.11.0</version>
 
     <url>http://github.com/mariomac/jeasse</url>
     <name>jEaSSE: Java Easy Server-Sent Events. Vertx3 connectors</name>
@@ -27,7 +27,7 @@
 		<dependency>
 			<groupId>info.macias</groupId>
 			<artifactId>jeasse-common</artifactId>
-            <version>0.10.0</version>
+            <version>0.11.0</version>
 		</dependency>
         <dependency>
             <groupId>io.vertx</groupId>
