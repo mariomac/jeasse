@@ -19,9 +19,9 @@ package info.macias.sse;
 import info.macias.sse.events.MessageEvent;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Iterator;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * This class implements a one-to-many connection for broadcasting messages across multiple subscribers.
@@ -30,7 +30,7 @@ import java.util.Set;
  */
 public class EventBroadcast {
 
-	protected Set<EventTarget> targets = Collections.synchronizedSet(new HashSet<>());
+    protected Queue<EventTarget> targets = new ConcurrentLinkedQueue<>();
 
 	/**
 	 * <p>Adds a subscriber from a <code>connectionRequest</code> that contains the information to allow sending back
@@ -42,10 +42,8 @@ public class EventBroadcast {
 	 * @throws IOException if there was an error during the acknowledge process between broadcaster and subscriber
 	 */
 	public void addSubscriber(EventTarget eventTarget) throws IOException {
-		synchronized (targets) {
-			targets.add(eventTarget.ok().open());
-		}
-	}
+        targets.add(eventTarget.ok().open());
+    }
 
 	/**
 	 * <p>Adds a subscriber to the broadcaster from a <code>connectionRequest</code> reference that contains the information to allow sending back
@@ -60,10 +58,8 @@ public class EventBroadcast {
 	 *         if the subscriber immediately closed the connection before receiving the welcome message
 	 */
 	public void addSubscriber(EventTarget eventTarget, MessageEvent welcomeMessage) throws IOException {
-		synchronized (targets) {
-			targets.add(eventTarget.ok().open().send(welcomeMessage));
-		}
-	}
+        targets.add(eventTarget.ok().open().send(welcomeMessage));
+    }
 
 	/**
 	 * Get total count of subscribers. Actual number of active subscribers may be less that this.
@@ -108,35 +104,30 @@ public class EventBroadcast {
 	 * @param messageEvent The instance that encapsulates all the desired fields for the {@link MessageEvent}
 	 */
 	public void broadcast(MessageEvent messageEvent) {
-		EventTarget[] disp;
-		synchronized (targets) {
-			disp = targets.toArray(new EventTarget[targets.size()]);
-		}
-		for(EventTarget dispatcher : disp) {
-			try {
-				dispatcher.send(messageEvent);
-			} catch (IOException e) {
-				// Client disconnected. Removing from targets
-				targets.remove(dispatcher);
-			}
-		}
-	}
+        for (Iterator<EventTarget> it = targets.iterator(); it.hasNext(); ) {
+            EventTarget dispatcher = it.next();
+            try {
+                dispatcher.send(messageEvent);
+            } catch (IOException e) {
+                // Client disconnected. Removing from targets
+                it.remove();
+            }
+        }
+    }
 
 	/**
 	 * Closes all the connections between the broadcaster and the subscribers, and detaches all of them from the
 	 * collection of subscribers.
 	 */
 	public void close() {
-		synchronized (targets) {
-			for(EventTarget d : targets) {
-				try {
-					d.close();
-				} catch (Exception e) {
-					// Uncontrolled exception when closing a dispatcher. Removing anyway and ignoring.
-				}
-			}
-			targets.clear();
-		}
-	}
+        for (EventTarget d : targets) {
+            try {
+                d.close();
+            } catch (Exception e) {
+                // Uncontrolled exception when closing a dispatcher. Removing anyway and ignoring.
+            }
+        }
+        targets.clear();
+    }
 }
 

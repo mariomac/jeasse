@@ -66,7 +66,7 @@ public class MessageEvent {
      *         reconnecting again to the server, after the event has been received
      * @return the value of the 'retry' field
      */
-    public Integer getRetry() {
+    public final Integer getRetry() {
         return retry;
     }
 
@@ -74,7 +74,7 @@ public class MessageEvent {
      * Returns the 'id' field: a string that provides an unique identifier for this event
      * @return the 'id' field
      */
-    public String getId() {
+    public final String getId() {
         return id;
     }
 
@@ -89,7 +89,7 @@ public class MessageEvent {
      * </pre>
      * @return the string representation of the MessageEvent. Ready to be transmitted.
      */
-    public String toString() {
+    public final String toString() {
         return toStringCache;
     }
 

@@ -6,7 +6,7 @@
     <parent>
         <groupId>info.macias</groupId>
         <artifactId>jeasse-examples</artifactId>
-        <version>0.11.0</version>
+        <version>0.11.1</version>
     </parent>
     <artifactId>jeasse-chat-servlet3</artifactId>
     <packaging>jar</packaging>
@@ -28,17 +28,17 @@
         <dependency>
             <groupId>info.macias</groupId>
             <artifactId>jeasse-servlet3</artifactId>
-            <version>0.11.0</version>
+            <version>0.11.1</version>
         </dependency>
         <dependency>
             <groupId>info.macias</groupId>
             <artifactId>jeasse-common</artifactId>
-            <version>0.11.0</version>
+            <version>0.11.1</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <version>[3.0.1,)</version>
+            <version>4.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
