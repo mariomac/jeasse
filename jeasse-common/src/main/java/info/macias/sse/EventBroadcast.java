@@ -36,6 +36,7 @@ public class EventBroadcast {
     protected Queue<EventTarget> targets = new ConcurrentLinkedQueue<>();
     private static final int MAX_HISTORY_SIZE = 10;
     protected SortedMap<String, MessageEvent> history = new ConcurrentSkipListMap(); // messages per id
+    protected EventTargetListener listener = null;
 
 	/**
 	 * <p>Adds a subscriber from a <code>connectionRequest</code> that contains the information to allow sending back
@@ -48,6 +49,7 @@ public class EventBroadcast {
 	 */
 	public void addSubscriber(EventTarget eventTarget) throws IOException {
         targets.add(eventTarget.ok().open());
+        if (listener != null) listener.subscriberJoined(eventTarget);
     }
     
 	/**
@@ -64,6 +66,7 @@ public class EventBroadcast {
 	 */
 	public void addSubscriber(EventTarget eventTarget, MessageEvent welcomeMessage) throws IOException {
         targets.add(eventTarget.ok().open().send(welcomeMessage));
+        if (listener != null) listener.subscriberJoined(eventTarget);
     }
 
 	/**
@@ -163,6 +166,7 @@ public class EventBroadcast {
             } catch (IOException e) {
                 // Client disconnected. Removing from targets
                 it.remove();
+                if (listener != null) listener.subscriberLeft(dispatcher);
             }
         }
         String id = messageEvent.getId();
@@ -187,5 +191,23 @@ public class EventBroadcast {
         targets.clear();
         history.clear();
     }
+
+    /**
+     * Set an EventTargetListener
+     *
+     * @param listener The new listener
+     */
+    public void setSubscribersListener(EventTargetListener listener) {
+        this.listener = listener;
+    }
+
+    /**
+     * Removes the EventTargetListener
+     */
+    public void removeSubscribersListener() {
+        listener = null;
+    }
+    
+       
 }
 
