@@ -25,6 +25,7 @@ import javax.servlet.AsyncListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * SSE dispatcher for one-to-one connections from Server to client-side subscriber
@@ -34,6 +35,8 @@ import java.io.IOException;
 public class ServletEventTarget implements EventTarget {
 
 	private final AsyncContext asyncContext;
+    private String id = null;
+    private static AtomicInteger nextID = new AtomicInteger();
 
     /**
      * Builds a new dispatcher from an {@link HttpServletRequest} object.
@@ -43,6 +46,7 @@ public class ServletEventTarget implements EventTarget {
         asyncContext = request.startAsync();
         asyncContext.setTimeout(0);
         asyncContext.addListener(new AsyncListenerImpl());
+        id = String.valueOf(nextID.incrementAndGet());
     }
 
     /**
@@ -129,6 +133,12 @@ public class ServletEventTarget implements EventTarget {
             completed = true;
             asyncContext.complete();
         }
+    }
+
+    @Override
+    public String getID()
+    {
+        return id;
     }
 
     private class AsyncListenerImpl implements AsyncListener {
