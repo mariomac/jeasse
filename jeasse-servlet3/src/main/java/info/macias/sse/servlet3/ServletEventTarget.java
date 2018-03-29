@@ -96,12 +96,13 @@ public class ServletEventTarget implements EventTarget {
 	@Override
     public ServletEventTarget send(String event, String data) throws IOException {
         HttpServletResponse response = (HttpServletResponse)asyncContext.getResponse();
-        response.getOutputStream().print(
+        response.getOutputStream().write(
                 new MessageEvent.Builder()
                     .setData(data)
                     .setEvent(event)
                     .build()
                     .toString()
+                    .getBytes("UTF-8")
         );
         response.getOutputStream().flush();
         return this;
@@ -117,7 +118,7 @@ public class ServletEventTarget implements EventTarget {
 	@Override
     public ServletEventTarget send(MessageEvent messageEvent) throws IOException {
 		HttpServletResponse response = (HttpServletResponse)asyncContext.getResponse();
-        response.getOutputStream().print(messageEvent.toString());
+        response.getOutputStream().write(messageEvent.toString().getBytes("UTF-8"));
 		response.getOutputStream().flush();
         return this;
     }
