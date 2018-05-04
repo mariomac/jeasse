@@ -1,5 +1,9 @@
 # History of releases
 
+## 0.11.2
+
+- Enable automatic re-dispatching of lost events based on the last-event-id field (thanks to @arkanovicz)
+
 ## 0.11.1
 
 - Improved multithread performance of event-broadcaster by using ConcurrentLinkedQueue.

@@ -6,7 +6,7 @@
     <groupId>info.macias</groupId>
     <artifactId>jeasse</artifactId>
     <packaging>pom</packaging>
-    <version>0.11.1</version>
+    <version>0.11.2</version>
 	<url>http://github.com/mariomac/jeasse</url>
 
     <name>jEaSSE: Java Easy Server-Sent Events</name>
