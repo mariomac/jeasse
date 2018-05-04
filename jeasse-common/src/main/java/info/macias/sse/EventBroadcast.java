@@ -20,8 +20,11 @@ import info.macias.sse.events.MessageEvent;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.SortedMap;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 /**
  * This class implements a one-to-many connection for broadcasting messages across multiple subscribers.
@@ -31,6 +34,9 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class EventBroadcast {
 
     protected Queue<EventTarget> targets = new ConcurrentLinkedQueue<>();
+    private static final int MAX_HISTORY_SIZE = 10;
+    protected SortedMap<String, MessageEvent> history = new ConcurrentSkipListMap(); // messages per id
+    protected EventTargetListener listener = null;
 
 	/**
 	 * <p>Adds a subscriber from a <code>connectionRequest</code> that contains the information to allow sending back
@@ -43,8 +49,9 @@ public class EventBroadcast {
 	 */
 	public void addSubscriber(EventTarget eventTarget) throws IOException {
         targets.add(eventTarget.ok().open());
+        if (listener != null) listener.subscriberJoined(eventTarget);
     }
-
+    
 	/**
 	 * <p>Adds a subscriber to the broadcaster from a <code>connectionRequest</code> reference that contains the information to allow sending back
 	 * information to the subsbriber (e.g. an <code>HttpServletRequest</code> for servlets or <code>HttpServerRequest</code>
@@ -59,8 +66,56 @@ public class EventBroadcast {
 	 */
 	public void addSubscriber(EventTarget eventTarget, MessageEvent welcomeMessage) throws IOException {
         targets.add(eventTarget.ok().open().send(welcomeMessage));
+        if (listener != null) listener.subscriberJoined(eventTarget);
     }
 
+	/**
+	 * <p>Adds a subscriber from a <code>connectionRequest</code> that contains the information to allow sending back
+	 * information to the subsbriber (e.g. an <code>HttpServletRequest</code> for servlets or <code>HttpServerRequest</code>
+     * plus a last-event_id field
+	 * for VertX)</p>
+	 *
+	 * @param eventTarget an event target to be subscribed to the broadcast messages
+     * @param lastEventId last received event id
+	 * @throws IOException if there was an error during the acknowledge process between broadcaster and subscriber
+	 */
+	public void addSubscriber(EventTarget eventTarget, String lastEventId) throws IOException {
+        addSubscriber(eventTarget);
+        lastEventId = padLastEventId(lastEventId);
+        if (lastEventId != null && lastEventId.length() > 0) {
+            synchronized (history) { // to avoid sending twice a new event
+                SortedMap<String, MessageEvent> missedEvents = history.tailMap(lastEventId);
+                Iterator<Map.Entry<String, MessageEvent>> it = missedEvents.entrySet().iterator();
+                if (it.hasNext()) {
+                    // skip first event if it's the same
+                    Map.Entry<String, MessageEvent> entry = it.next();
+                    if (entry.getKey().equals(lastEventId)) entry = it.next();
+                    while (it.hasNext()) eventTarget.send(it.next().getValue());
+                }
+            }
+        }
+    }
+
+    /**
+     * Utility method to left-pad last-event-id with zeros when it's a numeric id
+     */
+    private static String padLastEventId(String lastEventId) {
+        boolean isNumericId = false;
+        int numericId = 0;
+        if (lastEventId != null && lastEventId.length() > 0) {
+            try {
+                numericId = Integer.parseInt(lastEventId);
+                isNumericId = true;
+            }
+            catch (NumberFormatException nfe) {}
+        }
+        if (isNumericId && numericId >= 0) {
+            // left-pad with zeros to achieve numerical ordering
+            lastEventId = String.format("%010d", numericId);
+        }
+        return lastEventId;
+    }
+        
 	/**
 	 * Get total count of subscribers. Actual number of active subscribers may be less that this.
 	 * @return the size of the Set holding the subscribers
@@ -111,7 +166,13 @@ public class EventBroadcast {
             } catch (IOException e) {
                 // Client disconnected. Removing from targets
                 it.remove();
+                if (listener != null) listener.subscriberLeft(dispatcher);
             }
+        }
+        String id = messageEvent.getId();
+        if (id != null) {
+            history.put(id, messageEvent);
+            while (history.size() > MAX_HISTORY_SIZE) history.remove(history.firstKey());
         }
     }
 
@@ -128,6 +189,25 @@ public class EventBroadcast {
             }
         }
         targets.clear();
+        history.clear();
     }
+
+    /**
+     * Set an EventTargetListener
+     *
+     * @param listener The new listener
+     */
+    public void setSubscribersListener(EventTargetListener listener) {
+        this.listener = listener;
+    }
+
+    /**
+     * Removes the EventTargetListener
+     */
+    public void removeSubscribersListener() {
+        listener = null;
+    }
+    
+       
 }
 
