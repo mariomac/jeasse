@@ -17,15 +17,20 @@ limitations under the License.
 package info.macias.sse;
 
 import info.macias.sse.events.MessageEvent;
+import info.macias.sse.subscribe.IdMapper;
+import info.macias.sse.subscribe.RemoteCompletionListener;
 
 import java.io.IOException;
 
 /**
  * SSE dispatcher for one-to-one connections from Server to client-side subscriber
  *
+ * @param <I> Type of the identifier that distinguishes one remote subscriber from another
+ *           (e.g. a session ID, a user ID...)
+ *
  * @author <a href="http://github.com/mariomac">Mario Macías</a>
  */
-public interface EventTarget {
+public interface EventTarget<R, I> {
 
 	/**
 	 * If the connection is accepted, the server sends the 200 (OK) status message, plus the next HTTP headers:
@@ -36,7 +41,7 @@ public interface EventTarget {
 	 * </pre>
 	 * @return The same {@link EventTarget} object that received the method call
 	 */
-	EventTarget ok();
+	EventTarget<R, I> ok();
 
 	/**
 	 * Responds to the client-side subscriber that the connection has been open
@@ -45,7 +50,7 @@ public interface EventTarget {
 	 * @throws IOException if there was an error writing into the response's {@link java.io.OutputStream}. This may be
 	 * a common exception: e.g. it will be thrown when the SSE subscriber closes the connection
 	 */
-	EventTarget open() throws IOException;
+	EventTarget<R, I> open() throws IOException;
 
 	/**
 	 * Sends a {@link MessageEvent} to the subscriber, containing only 'event' and 'data' fields.
@@ -55,7 +60,7 @@ public interface EventTarget {
 	 * @throws IOException if there was an error writing into the response's {@link java.io.OutputStream}. This may be
 	 * a common exception: e.g. it will be thrown when the SSE subscriber closes the connection
 	 */
-	EventTarget send(String event, String data) throws IOException;
+	EventTarget<R, I> send(String event, String data) throws IOException;
 
 	/**
 	 * Sends a {@link MessageEvent} to the subscriber
@@ -64,11 +69,18 @@ public interface EventTarget {
 	 * @throws IOException if there was an error writing into the response's {@link java.io.OutputStream}. This may be
 	 * a common exception: e.g. it will be thrown when the SSE subscriber closes the connection
 	 */
-	EventTarget send(MessageEvent messageEvent) throws IOException;
+	EventTarget<R, I> send(MessageEvent messageEvent) throws IOException;
 
 	/**
 	 * Closes the connection between the server and the client.
 	 */
 	void close();
 
+    /**
+     * Specifies the action to execute when a remote subscriber closes its connection.
+     * @param listener The action to execute when a remote subscriber closes its connection.
+     */
+    EventTarget<R, I> onRemoteClose(RemoteCompletionListener<I> listener);
+
+    EventTarget<R, I> withMapper(IdMapper<R, I> mapper);
 }

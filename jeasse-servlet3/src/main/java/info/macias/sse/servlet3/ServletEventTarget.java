@@ -17,6 +17,9 @@ limitations under the License.
 package info.macias.sse.servlet3;
 
 import info.macias.sse.EventTarget;
+import info.macias.sse.subscribe.IdMapper;
+import info.macias.sse.subscribe.RemoteCompletionListener;
+import info.macias.sse.err.ClosedConnectionException;
 import info.macias.sse.events.MessageEvent;
 
 import javax.servlet.AsyncContext;
@@ -25,23 +28,39 @@ import javax.servlet.AsyncListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * SSE dispatcher for one-to-one connections from Server to client-side subscriber
  *
+ * @param <I> Type of the identifier that distinguishes one remote subscriber from another
+ *           (e.g. a session ID, a user ID...)
+ *
  * @author <a href="http://github.com/mariomac">Mario Macías</a>
  */
-public class ServletEventTarget implements EventTarget {
+public class ServletEventTarget<I> implements EventTarget<AsyncContext, I> {
 
-	private final AsyncContext asyncContext;
+    private boolean completed = false;
+    private RemoteCompletionListener<I> completionListener;
+    private IdMapper<AsyncContext, I> idMapper;
+    private final AsyncContext asyncContext;
 
     /**
      * Builds a new dispatcher from an {@link HttpServletRequest} object.
      * @param request The {@link HttpServletRequest} reference, as sent by the subscriber.
+     * @deprecated Use {@link #create(HttpServletRequest)}
      */
     public ServletEventTarget(HttpServletRequest request) {
         asyncContext = request.startAsync();
         asyncContext.setTimeout(0);
+        asyncContext.addListener(new AsyncListenerImpl());
+    }
+
+    private ServletEventTarget(AsyncContext asyncContext) {
+        this.asyncContext = asyncContext;
+        asyncContext.setTimeout(0); // TODO: allow setting timeout
         asyncContext.addListener(new AsyncListenerImpl());
     }
 
@@ -55,7 +74,7 @@ public class ServletEventTarget implements EventTarget {
      * @return The same {@link ServletEventTarget} object that received the method call
      */
 	@Override
-    public ServletEventTarget ok() {
+    public ServletEventTarget<I> ok() {
         HttpServletResponse response = (HttpServletResponse)asyncContext.getResponse();
         response.setStatus(200);
         response.setContentType("text/event-stream");
@@ -73,7 +92,9 @@ public class ServletEventTarget implements EventTarget {
      * a common exception: e.g. it will be thrown when the SSE subscriber closes the connection
      */
 	@Override
-    public ServletEventTarget open() throws IOException {
+    public ServletEventTarget<I> open() throws IOException {
+        assertConnectionStatus();
+
         HttpServletResponse response = (HttpServletResponse)asyncContext.getResponse();
         response.getOutputStream().print("event: open\n\n");
         response.getOutputStream().flush();
@@ -90,7 +111,8 @@ public class ServletEventTarget implements EventTarget {
      * a common exception: e.g. it will be thrown when the SSE subscriber closes the connection
      */
 	@Override
-    public ServletEventTarget send(String event, String data) throws IOException {
+    public ServletEventTarget<I> send(String event, String data) throws IOException {
+        assertConnectionStatus();
         HttpServletResponse response = (HttpServletResponse)asyncContext.getResponse();
         response.getOutputStream().print(
                 new MessageEvent.Builder()
@@ -111,14 +133,19 @@ public class ServletEventTarget implements EventTarget {
      * a common exception: e.g. it will be thrown when the SSE subscriber closes the connection
      */
 	@Override
-    public ServletEventTarget send(MessageEvent messageEvent) throws IOException {
+    public ServletEventTarget<I> send(MessageEvent messageEvent) throws IOException {
+	    assertConnectionStatus();
 		HttpServletResponse response = (HttpServletResponse)asyncContext.getResponse();
         response.getOutputStream().print(messageEvent.toString());
 		response.getOutputStream().flush();
         return this;
     }
 
-    private boolean completed = false;
+    private void assertConnectionStatus() throws ClosedConnectionException {
+	    if (completed) {
+	        throw new ClosedConnectionException();
+        }
+    }
 
     /**
      * Closes the connection between the server and the client.
@@ -131,22 +158,44 @@ public class ServletEventTarget implements EventTarget {
         }
     }
 
+    @Override
+    public EventTarget<AsyncContext, I> onRemoteClose(RemoteCompletionListener<I> listener) {
+	    this.completionListener = listener;
+        return this;
+    }
+
+    @Override
+    public EventTarget<AsyncContext, I> withMapper(IdMapper<AsyncContext, I> mapper) {
+	    this.idMapper = mapper;
+        return null;
+    }
+
     private class AsyncListenerImpl implements AsyncListener {
+	    private void complete() {
+	        completed = true;
+        }
         @Override
-        public void onComplete(AsyncEvent event) throws IOException {
-            completed = true;
+        public void onComplete(AsyncEvent event) {
+            complete();
         }
 
         @Override
-        public void onTimeout(AsyncEvent event) throws IOException {
+        public void onTimeout(AsyncEvent event) {
+            complete();
         }
 
         @Override
-        public void onError(AsyncEvent event) throws IOException {
+        public void onError(AsyncEvent event) {
+            complete();
         }
 
         @Override
-        public void onStartAsync(AsyncEvent event) throws IOException {
+        public void onStartAsync(AsyncEvent event) {
         }
+    }
+
+    public static ServletEventTarget create(HttpServletRequest request) {
+        AsyncContext asyncContext = request.startAsync();
+        return new ServletEventTarget(asyncContext);
     }
 }

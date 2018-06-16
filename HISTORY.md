@@ -1,5 +1,10 @@
 # History of releases
 
+## NEXT
+
+* Discarded 0.11.2 changes
+* Removed deprecated `SseBroadcaster` and `SseDispatcher` classes.
+
 ## 0.11.2 (discarded version)
 
 - Enable automatic re-dispatching of lost events based on the last-event-id field (thanks to @arkanovicz)
