@@ -71,12 +71,4 @@ public interface EventTarget {
 	 */
 	void close();
 
-    /**
-     * Returns a unique event target ID (needs an override in the implementing class)
-     */
-    default String getID()
-    {
-        return null;
-    }
-
 }

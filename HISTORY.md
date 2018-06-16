@@ -1,6 +1,6 @@
 # History of releases
 
-## 0.11.2
+## 0.11.2 (discarded version)
 
 - Enable automatic re-dispatching of lost events based on the last-event-id field (thanks to @arkanovicz)
 

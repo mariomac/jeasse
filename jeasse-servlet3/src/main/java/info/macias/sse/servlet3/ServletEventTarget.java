@@ -25,7 +25,6 @@ import javax.servlet.AsyncListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * SSE dispatcher for one-to-one connections from Server to client-side subscriber
@@ -35,8 +34,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ServletEventTarget implements EventTarget {
 
 	private final AsyncContext asyncContext;
-    private String id = null;
-    private static AtomicInteger nextID = new AtomicInteger();
 
     /**
      * Builds a new dispatcher from an {@link HttpServletRequest} object.
@@ -46,7 +43,6 @@ public class ServletEventTarget implements EventTarget {
         asyncContext = request.startAsync();
         asyncContext.setTimeout(0);
         asyncContext.addListener(new AsyncListenerImpl());
-        id = String.valueOf(nextID.incrementAndGet());
     }
 
     /**
@@ -96,13 +92,12 @@ public class ServletEventTarget implements EventTarget {
 	@Override
     public ServletEventTarget send(String event, String data) throws IOException {
         HttpServletResponse response = (HttpServletResponse)asyncContext.getResponse();
-        response.getOutputStream().write(
+        response.getOutputStream().print(
                 new MessageEvent.Builder()
                     .setData(data)
                     .setEvent(event)
                     .build()
                     .toString()
-                    .getBytes("UTF-8")
         );
         response.getOutputStream().flush();
         return this;
@@ -118,7 +113,7 @@ public class ServletEventTarget implements EventTarget {
 	@Override
     public ServletEventTarget send(MessageEvent messageEvent) throws IOException {
 		HttpServletResponse response = (HttpServletResponse)asyncContext.getResponse();
-        response.getOutputStream().write(messageEvent.toString().getBytes("UTF-8"));
+        response.getOutputStream().print(messageEvent.toString());
 		response.getOutputStream().flush();
         return this;
     }
@@ -134,12 +129,6 @@ public class ServletEventTarget implements EventTarget {
             completed = true;
             asyncContext.complete();
         }
-    }
-
-    @Override
-    public String getID()
-    {
-        return id;
     }
 
     private class AsyncListenerImpl implements AsyncListener {

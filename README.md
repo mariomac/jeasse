@@ -15,7 +15,7 @@ Features:
     <dependency>
         <groupId>info.macias</groupId>
         <artifactId>jeasse-servlet3</artifactId>
-        <version>0.11.2</version>
+        <version>0.11.1</version>
     </dependency>
     
 (You also need to provide the `servlet-api` [3.0.1,) dependencies)
@@ -25,7 +25,7 @@ Features:
     <dependency>
         <groupId>info.macias</groupId>
         <artifactId>jeasse-vertx3</artifactId>
-        <version>0.11.2</version>
+        <version>0.11.1</version>
     </dependency>
 
 (You also need to provide `vertx-core` and `vertx-web` [3.1.0,) dependencies.
