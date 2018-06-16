@@ -17,10 +17,10 @@ limitations under the License.
 package info.macias.sse.servlet3;
 
 import info.macias.sse.EventTarget;
-import info.macias.sse.subscribe.IdMapper;
-import info.macias.sse.subscribe.RemoteCompletionListener;
 import info.macias.sse.err.ClosedConnectionException;
 import info.macias.sse.events.MessageEvent;
+import info.macias.sse.subscribe.IdMapper;
+import info.macias.sse.subscribe.RemoteCompletionListener;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
@@ -28,9 +28,6 @@ import javax.servlet.AsyncListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Stream;
 
 /**
  * SSE dispatcher for one-to-one connections from Server to client-side subscriber
@@ -40,12 +37,12 @@ import java.util.stream.Stream;
  *
  * @author <a href="http://github.com/mariomac">Mario Macías</a>
  */
-public class ServletEventTarget<I> implements EventTarget<AsyncContext, I> {
+public class ServletEventTarget<I> implements EventTarget<I> {
 
     private boolean completed = false;
     private RemoteCompletionListener<I> completionListener;
-    private IdMapper<AsyncContext, I> idMapper;
     private final AsyncContext asyncContext;
+    private I identifier;
 
     /**
      * Builds a new dispatcher from an {@link HttpServletRequest} object.
@@ -54,12 +51,13 @@ public class ServletEventTarget<I> implements EventTarget<AsyncContext, I> {
      */
     public ServletEventTarget(HttpServletRequest request) {
         asyncContext = request.startAsync();
-        asyncContext.setTimeout(0);
+        asyncContext.setTimeout(0);  // TODO: allow setting timeout
         asyncContext.addListener(new AsyncListenerImpl());
     }
 
-    private ServletEventTarget(AsyncContext asyncContext) {
+    private ServletEventTarget(I identifier, AsyncContext asyncContext) {
         this.asyncContext = asyncContext;
+        this.identifier = identifier;
         asyncContext.setTimeout(0); // TODO: allow setting timeout
         asyncContext.addListener(new AsyncListenerImpl());
     }
@@ -152,41 +150,35 @@ public class ServletEventTarget<I> implements EventTarget<AsyncContext, I> {
      */
 	@Override
     public void close() {
-        if(!completed) {
+        if(!completed) { // todo: need to synchronize?
             completed = true;
             asyncContext.complete();
+            if (completionListener != null) {
+                completionListener.onClose(this);
+            }
         }
     }
 
     @Override
-    public EventTarget<AsyncContext, I> onRemoteClose(RemoteCompletionListener<I> listener) {
+    public ServletEventTarget<I> onRemoteClose(RemoteCompletionListener<I> listener) {
 	    this.completionListener = listener;
         return this;
     }
 
-    @Override
-    public EventTarget<AsyncContext, I> withMapper(IdMapper<AsyncContext, I> mapper) {
-	    this.idMapper = mapper;
-        return null;
-    }
-
     private class AsyncListenerImpl implements AsyncListener {
-	    private void complete() {
-	        completed = true;
-        }
         @Override
         public void onComplete(AsyncEvent event) {
-            complete();
+            close();
         }
 
         @Override
         public void onTimeout(AsyncEvent event) {
-            complete();
+            close();
         }
 
         @Override
         public void onError(AsyncEvent event) {
-            complete();
+            close();
         }
 
         @Override
@@ -194,8 +186,17 @@ public class ServletEventTarget<I> implements EventTarget<AsyncContext, I> {
         }
     }
 
-    public static ServletEventTarget create(HttpServletRequest request) {
+    @Override
+    public I getIdentifier() {
+        return identifier;
+    }
+
+    public static ServletEventTarget<AsyncContext> create(HttpServletRequest request) {
+        return create(request, IdMapper::identity);
+    }
+
+    public static <IdT> ServletEventTarget<IdT> create( HttpServletRequest request, IdMapper<AsyncContext, IdT> mapper) {
         AsyncContext asyncContext = request.startAsync();
-        return new ServletEventTarget(asyncContext);
+        return new ServletEventTarget<>(mapper.map(asyncContext), asyncContext);
     }
 }

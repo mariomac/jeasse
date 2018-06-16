@@ -16,22 +16,20 @@ limitations under the License.
 package info.macias.sse;
 
 import info.macias.sse.events.MessageEvent;
+import info.macias.sse.subscribe.RemoteCompletionListener;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
-
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static junit.framework.Assert.*;
 
 public class ConcurrencyTest {
     private static final int CONCURRENT_THREADS = 100;
@@ -52,6 +50,16 @@ public class ConcurrencyTest {
 
         public AutoDisconnectingEventTarget(int eventsBeforeClosing) {
             this.eventsBeforeClosing = eventsBeforeClosing;
+        }
+
+        @Override
+        public Object getIdentifier() {
+            return null;
+        }
+
+        @Override
+        public EventTarget onRemoteClose(RemoteCompletionListener listener) {
+            return this;
         }
 
         @Override

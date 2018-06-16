@@ -16,6 +16,7 @@ limitations under the License.
 
 package info.macias.sse;
 
+import info.macias.sse.err.ClosedConnectionException;
 import info.macias.sse.events.MessageEvent;
 
 import java.io.IOException;
@@ -104,13 +105,17 @@ public class EventBroadcast {
 	 * @param messageEvent The instance that encapsulates all the desired fields for the {@link MessageEvent}
 	 */
 	public void broadcast(MessageEvent messageEvent) {
+        System.out.println("length = " + targets.size());
         for (Iterator<EventTarget> it = targets.iterator(); it.hasNext(); ) {
             EventTarget dispatcher = it.next();
             try {
                 dispatcher.send(messageEvent);
+            } catch(ClosedConnectionException e) {
+                it.remove();
             } catch (IOException e) {
                 // Client disconnected. Removing from targets
                 it.remove();
+                dispatcher.close();
             }
         }
     }
@@ -129,5 +134,7 @@ public class EventBroadcast {
         }
         targets.clear();
     }
+
+    // todo: add configurable ping mechanism to detect closed clients when no timeout is set
 }
 

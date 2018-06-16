@@ -81,16 +81,4 @@ public class ChatVerticle extends AbstractVerticle {
 	public void stop() throws Exception {
 		broadcaster.close();
 	}
-
-	// Dirty aux function
-	private static String dirtyJsonParse(String json) {
-		String senderChunk = "\"sender\":\"";
-		String messageChunk = "\"message\":\"";
-		String sender = json.substring(json.indexOf(senderChunk) + senderChunk.length(),
-				json.indexOf("\","+messageChunk));
-		String message = json.substring(json.indexOf(messageChunk) + messageChunk.length(),
-				json.indexOf("\"}"));
-		if("".equals(sender.trim())) sender = "Anonymous";
-		return sender + " says: " + message;
-	}
 }

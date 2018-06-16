@@ -15,11 +15,9 @@ limitations under the License.
 */
 package info.macias.sse.servlet3.example.chat;
 
-import info.macias.sse.EventBroadcast;
-import info.macias.sse.events.MessageEvent;
+import info.macias.see.example.ChatRoom;
 import info.macias.sse.servlet3.ServletEventTarget;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -32,44 +30,35 @@ import java.util.Scanner;
  */
 @WebServlet(asyncSupported = true)
 public class ChatServlet extends HttpServlet {
-    EventBroadcast broadcaster = new EventBroadcast();
+    private ChatRoom room = new ChatRoom();
 
-    // When somebody asks to be connected to the chat servlet, it welcomes it and adds to the list of subscribers
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        broadcaster.addSubscriber(new ServletEventTarget(req),
-                new MessageEvent.Builder().setData("*** Welcome to the chat server ***").build());
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        room.addNewUser(ServletEventTarget.create(req,
+                c -> c.getRequest().getRemoteHost()));
+
+        //broadcaster.addSubscriber(new ServletEventTarget(req),
+        //        new MessageEvent.Builder().setData("*** Welcome to the chat server ***").build());
     }
 
     // When somebody posts a message, it broadcasts it to all its subscribers
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         Scanner scanner = new Scanner(req.getInputStream());
         StringBuilder sb = new StringBuilder();
         while (scanner.hasNextLine()) {
             sb.append(scanner.nextLine());
         }
         // dirty json parsing
-        broadcaster.broadcast("message", dirtyJsonParse(sb.toString()));
+        room.onMessage(sb.toString());
     }
 
     // When the servlet is destroyed, it closes all the broadcast subscribers
     @Override
     public void destroy() {
-        broadcaster.close();
+        room.close();
         super.destroy();
     }
 
-    // Dirty aux function
-    private static String dirtyJsonParse(String json) {
-        String senderChunk = "\"sender\":\"";
-        String messageChunk = "\"message\":\"";
-        String sender = json.substring(json.indexOf(senderChunk) + senderChunk.length(),
-                json.indexOf("\","+messageChunk));
-        String message = json.substring(json.indexOf(messageChunk) + messageChunk.length(),
-                json.indexOf("\"}"));
-        if("".equals(sender.trim())) sender = "Anonymous";
-        return sender + " says: " + message;
-    }
 }
 
