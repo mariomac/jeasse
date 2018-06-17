@@ -105,7 +105,6 @@ public class EventBroadcast {
 	 * @param messageEvent The instance that encapsulates all the desired fields for the {@link MessageEvent}
 	 */
 	public void broadcast(MessageEvent messageEvent) {
-        System.out.println("length = " + targets.size());
         for (Iterator<EventTarget> it = targets.iterator(); it.hasNext(); ) {
             EventTarget dispatcher = it.next();
             try {

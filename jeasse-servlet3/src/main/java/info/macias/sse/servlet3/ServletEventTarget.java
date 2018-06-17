@@ -139,6 +139,11 @@ public class ServletEventTarget<I> implements EventTarget<I> {
         return this;
     }
 
+    public ServletEventTarget<I> timeout(long ms) {
+	    asyncContext.setTimeout(ms);
+	    return this;
+    }
+
     private void assertConnectionStatus() throws ClosedConnectionException {
 	    if (completed) {
 	        throw new ClosedConnectionException();
@@ -195,7 +200,7 @@ public class ServletEventTarget<I> implements EventTarget<I> {
         return create(request, IdMapper::identity);
     }
 
-    public static <IdT> ServletEventTarget<IdT> create( HttpServletRequest request, IdMapper<AsyncContext, IdT> mapper) {
+    public static <IdT> ServletEventTarget<IdT> create(HttpServletRequest request, IdMapper<AsyncContext, IdT> mapper) {
         AsyncContext asyncContext = request.startAsync();
         return new ServletEventTarget<>(mapper.map(asyncContext), asyncContext);
     }

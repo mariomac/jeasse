@@ -15,9 +15,9 @@ limitations under the License.
 */
 package info.macias.sse.servlet3.example.chat;
 
-import info.macias.see.example.ChatRoom;
 import info.macias.sse.servlet3.ServletEventTarget;
 
+import javax.servlet.AsyncContext;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -32,13 +32,18 @@ import java.util.Scanner;
 public class ChatServlet extends HttpServlet {
     private ChatRoom room = new ChatRoom();
 
+    private static String mapId(AsyncContext context) {
+        return mapId((HttpServletRequest)context.getRequest());
+    }
+
+    private static String mapId(HttpServletRequest req) {
+        return req.getParameter("uuid");
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        room.addNewUser(ServletEventTarget.create(req,
-                c -> c.getRequest().getRemoteHost()));
-
-        //broadcaster.addSubscriber(new ServletEventTarget(req),
-        //        new MessageEvent.Builder().setData("*** Welcome to the chat server ***").build());
+        room.addNewUser(ServletEventTarget.create(req, ChatServlet::mapId)
+        .timeout(10000));
     }
 
     // When somebody posts a message, it broadcasts it to all its subscribers
@@ -49,8 +54,7 @@ public class ChatServlet extends HttpServlet {
         while (scanner.hasNextLine()) {
             sb.append(scanner.nextLine());
         }
-        // dirty json parsing
-        room.onMessage(sb.toString());
+        room.onMessage(ChatServlet.mapId(req), sb.toString());
     }
 
     // When the servlet is destroyed, it closes all the broadcast subscribers

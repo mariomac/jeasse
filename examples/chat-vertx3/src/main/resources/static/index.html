@@ -144,6 +144,10 @@ limitations under the License.
         }
     }, false);
 
+    window.onbeforeunload = function(e){
+        source.close();
+    };
+
 </script>
 </body>
 </html>

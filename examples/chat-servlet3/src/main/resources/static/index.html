@@ -54,30 +54,37 @@ limitations under the License.
             font-family: "Comic Sans MS", sans-serif;
             font-size: 16px;
         }
+
         #input input {
             padding: 10px;
             border: solid 1px #dcdcdc;
             transition: box-shadow 0.3s, border 0.3s;
         }
+
         #input input:focus,
         #input input.focus {
             border: solid 1px #707070;
             box-shadow: 0 0 5px 1px #969696;
         }
+
         #input {
             display: flex;
         }
+
         #input #name {
-            float:left;
+            float: left;
         }
+
         #input #message {
             flex: 2;
             margin-left: 5px;
 
         }
+
         #input #submit {
-            float:right;
+            float: right;
         }
+
         #input button {
             padding: 10px;
             border: solid 1px black;
@@ -104,28 +111,39 @@ limitations under the License.
     console.log(message);
     console.log(submit);
 
-    function submitMsg() {
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "/send", true);
-        xhr.send(JSON.stringify({sender:sender.value,message:message.value}));
-        message.value="";
-    }
-    message.onkeydown = function(key) {
-        if(key.keyCode == 13) {
-            submitMsg();
-        }
+    function uuidv4() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
     }
 
+    var uniqueId = uuidv4();
+
+    function submitMsg() {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/send?uuid=" + uniqueId, true);
+        xhr.send(JSON.stringify({sender: sender.value, message: message.value}));
+        message.value = "";
+    }
+
+    message.onkeydown = function (key) {
+        if (key.keyCode == 13) {
+            submitMsg();
+        }
+    };
+
     function print(message) {
-        message = message.replace(/\n/g, "<br/>")
-        message = message.replace(/\s/g, "&nbsp;")
+        message = message.replace(/\n/g, "<br/>");
+        message = message.replace(/\s/g, "&nbsp;");
         var element = document.getElementById("console");
         element.innerHTML += message + "<br/>";
         element.scrollTop = element.scrollHeight;
     }
+
     var source;
     if (!!window.EventSource) {
-        source = new EventSource('/send');
+        source = new EventSource("/send?uuid=" + uniqueId);
     } else {
         print("YOUR BROWSER DOES NOT SUPPORT SSE");
     }
@@ -138,11 +156,19 @@ limitations under the License.
         // Connection was opened.
     }, false);
 
+    source.addEventListener("ping", function (e) {
+        console.log(e);
+    }, false);
+
     source.addEventListener('error', function (e) {
         if (e.readyState == EventSource.CLOSED) {
             print("**** ERROR: " + e);
         }
     }, false);
+
+    window.onbeforeunload = function (e) {
+        source.close();
+    };
 
 </script>
 </body>
