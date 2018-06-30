@@ -48,7 +48,7 @@ public class ConcurrencyTest {
         int exceptions = 0;
         final int eventsBeforeClosing;
 
-        public AutoDisconnectingEventTarget(int eventsBeforeClosing) {
+        AutoDisconnectingEventTarget(int eventsBeforeClosing) {
             this.eventsBeforeClosing = eventsBeforeClosing;
         }
 

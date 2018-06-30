@@ -18,6 +18,7 @@ package info.macias.sse.vertx3;
 
 import info.macias.sse.EventTarget;
 import info.macias.sse.events.MessageEvent;
+import info.macias.sse.subscribe.RemoteCompletionListener;
 import io.vertx.core.http.HttpServerRequest;
 
 import java.io.IOException;
@@ -28,6 +29,7 @@ import java.io.IOException;
  * @author <a href="http://github.com/mariomac">Mario Macías</a>
  */
 public class VertxEventTarget implements EventTarget {
+
 
 	private HttpServerRequest request;
 
@@ -62,11 +64,9 @@ public class VertxEventTarget implements EventTarget {
      * Responds to the client-side subscriber that the connection has been open
      *
      * @return The same {@link VertxEventTarget} object that received the method call
-     * @throws IOException if there was an error writing into the response's {@link java.io.OutputStream}. This may be
-     * a common exception: e.g. it will be thrown when the SSE subscriber closes the connection
      */
 	@Override
-    public VertxEventTarget open() throws IOException {
+    public VertxEventTarget open() {
 		request.response().write("event: open\n\n");
 		return this;
     }
@@ -76,11 +76,9 @@ public class VertxEventTarget implements EventTarget {
      * @param event The descriptor of the 'event' field.
      * @param data The content of the 'data' field.
      * @return The same {@link VertxEventTarget} object that received the method call
-     * @throws IOException if there was an error writing into the response's {@link java.io.OutputStream}. This may be
-     * a common exception: e.g. it will be thrown when the SSE subscriber closes the connection
      */
 	@Override
-    public VertxEventTarget send(String event, String data) throws IOException {
+    public VertxEventTarget send(String event, String data) {
 		request.response().write(
                 new MessageEvent.Builder()
                     .setData(data)
@@ -95,14 +93,21 @@ public class VertxEventTarget implements EventTarget {
      * Sends a {@link MessageEvent} to the subscriber
      * @param messageEvent The instance that encapsulates all the desired fields for the {@link MessageEvent}
      * @return The same {@link VertxEventTarget} object that received the method call
-     * @throws IOException if there was an error writing into the response's {@link java.io.OutputStream}. This may be
-     * a common exception: e.g. it will be thrown when the SSE subscriber closes the connection
      */
 	@Override
-    public VertxEventTarget send(MessageEvent messageEvent) throws IOException {
+    public VertxEventTarget send(MessageEvent messageEvent) {
 		request.response().write(messageEvent.toString());
-
 		return this;
+    }
+
+    @Override
+    public Object getIdentifier() {
+        return null;
+    }
+
+    @Override
+    public EventTarget onRemoteClose(RemoteCompletionListener listener) {
+        return null;
     }
 
     private boolean completed = false;

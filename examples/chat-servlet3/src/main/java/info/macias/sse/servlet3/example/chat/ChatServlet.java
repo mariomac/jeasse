@@ -42,8 +42,7 @@ public class ChatServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        room.addNewUser(ServletEventTarget.create(req, ChatServlet::mapId)
-        .timeout(10000));
+        room.addNewUser(ServletEventTarget.create(req, ChatServlet::mapId));
     }
 
     // When somebody posts a message, it broadcasts it to all its subscribers

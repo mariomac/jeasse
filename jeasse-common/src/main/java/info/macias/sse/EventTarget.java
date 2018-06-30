@@ -17,7 +17,6 @@ limitations under the License.
 package info.macias.sse;
 
 import info.macias.sse.events.MessageEvent;
-import info.macias.sse.subscribe.IdMapper;
 import info.macias.sse.subscribe.RemoteCompletionListener;
 
 import java.io.IOException;

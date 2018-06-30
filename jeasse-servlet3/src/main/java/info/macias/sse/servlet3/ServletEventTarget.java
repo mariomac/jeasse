@@ -33,8 +33,7 @@ import java.io.IOException;
  * SSE dispatcher for one-to-one connections from Server to client-side subscriber
  *
  * @param <I> Type of the identifier that distinguishes one remote subscriber from another
- *           (e.g. a session ID, a user ID...)
- *
+ *            (e.g. a session ID, a user ID...)
  * @author <a href="http://github.com/mariomac">Mario Macías</a>
  */
 public class ServletEventTarget<I> implements EventTarget<I> {
@@ -46,6 +45,7 @@ public class ServletEventTarget<I> implements EventTarget<I> {
 
     /**
      * Builds a new dispatcher from an {@link HttpServletRequest} object.
+     *
      * @param request The {@link HttpServletRequest} reference, as sent by the subscriber.
      * @deprecated Use {@link #create(HttpServletRequest)}
      */
@@ -69,16 +69,17 @@ public class ServletEventTarget<I> implements EventTarget<I> {
      *     Cache-Control: no-cache
      *     Connection: keep-alive
      * </pre>
+     *
      * @return The same {@link ServletEventTarget} object that received the method call
      */
-	@Override
+    @Override
     public ServletEventTarget<I> ok() {
-        HttpServletResponse response = (HttpServletResponse)asyncContext.getResponse();
+        HttpServletResponse response = (HttpServletResponse) asyncContext.getResponse();
         response.setStatus(200);
         response.setContentType("text/event-stream");
         response.setCharacterEncoding("UTF-8");
-        response.setHeader("Cache-Control","no-cache");
-        response.setHeader("Connection","keep-alive");
+        response.setHeader("Cache-Control", "no-cache");
+        response.setHeader("Connection", "keep-alive");
         return this;
     }
 
@@ -87,13 +88,13 @@ public class ServletEventTarget<I> implements EventTarget<I> {
      *
      * @return The same {@link ServletEventTarget} object that received the method call
      * @throws IOException if there was an error writing into the response's {@link java.io.OutputStream}. This may be
-     * a common exception: e.g. it will be thrown when the SSE subscriber closes the connection
+     *                     a common exception: e.g. it will be thrown when the SSE subscriber closes the connection
      */
-	@Override
+    @Override
     public ServletEventTarget<I> open() throws IOException {
         assertConnectionStatus();
 
-        HttpServletResponse response = (HttpServletResponse)asyncContext.getResponse();
+        HttpServletResponse response = (HttpServletResponse) asyncContext.getResponse();
         response.getOutputStream().print("event: open\n\n");
         response.getOutputStream().flush();
 
@@ -102,22 +103,23 @@ public class ServletEventTarget<I> implements EventTarget<I> {
 
     /**
      * Sends a {@link MessageEvent} to the subscriber, containing only 'event' and 'data' fields.
+     *
      * @param event The descriptor of the 'event' field.
-     * @param data The content of the 'data' field.
+     * @param data  The content of the 'data' field.
      * @return The same {@link ServletEventTarget} object that received the method call
      * @throws IOException if there was an error writing into the response's {@link java.io.OutputStream}. This may be
-     * a common exception: e.g. it will be thrown when the SSE subscriber closes the connection
+     *                     a common exception: e.g. it will be thrown when the SSE subscriber closes the connection
      */
-	@Override
+    @Override
     public ServletEventTarget<I> send(String event, String data) throws IOException {
         assertConnectionStatus();
-        HttpServletResponse response = (HttpServletResponse)asyncContext.getResponse();
+        HttpServletResponse response = (HttpServletResponse) asyncContext.getResponse();
         response.getOutputStream().print(
                 new MessageEvent.Builder()
-                    .setData(data)
-                    .setEvent(event)
-                    .build()
-                    .toString()
+                        .setData(data)
+                        .setEvent(event)
+                        .build()
+                        .toString()
         );
         response.getOutputStream().flush();
         return this;
@@ -125,37 +127,38 @@ public class ServletEventTarget<I> implements EventTarget<I> {
 
     /**
      * Sends a {@link MessageEvent} to the subscriber
+     *
      * @param messageEvent The instance that encapsulates all the desired fields for the {@link MessageEvent}
      * @return The same {@link ServletEventTarget} object that received the method call
      * @throws IOException if there was an error writing into the response's {@link java.io.OutputStream}. This may be
-     * a common exception: e.g. it will be thrown when the SSE subscriber closes the connection
+     *                     a common exception: e.g. it will be thrown when the SSE subscriber closes the connection
      */
-	@Override
+    @Override
     public ServletEventTarget<I> send(MessageEvent messageEvent) throws IOException {
-	    assertConnectionStatus();
-		HttpServletResponse response = (HttpServletResponse)asyncContext.getResponse();
+        assertConnectionStatus();
+        HttpServletResponse response = (HttpServletResponse) asyncContext.getResponse();
         response.getOutputStream().print(messageEvent.toString());
-		response.getOutputStream().flush();
+        response.getOutputStream().flush();
         return this;
     }
 
     public ServletEventTarget<I> timeout(long ms) {
-	    asyncContext.setTimeout(ms);
-	    return this;
+        asyncContext.setTimeout(ms);
+        return this;
     }
 
     private void assertConnectionStatus() throws ClosedConnectionException {
-	    if (completed) {
-	        throw new ClosedConnectionException();
+        if (completed) {
+            throw new ClosedConnectionException();
         }
     }
 
     /**
      * Closes the connection between the server and the client.
      */
-	@Override
+    @Override
     public void close() {
-        if(!completed) { // todo: need to synchronize?
+        if (!completed) { // todo: need to synchronize?
             completed = true;
             asyncContext.complete();
             if (completionListener != null) {
@@ -166,7 +169,7 @@ public class ServletEventTarget<I> implements EventTarget<I> {
 
     @Override
     public ServletEventTarget<I> onRemoteClose(RemoteCompletionListener<I> listener) {
-	    this.completionListener = listener;
+        this.completionListener = listener;
         return this;
     }
 
