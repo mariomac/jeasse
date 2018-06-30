@@ -1,5 +1,10 @@
 # History of releases
 
+## 0.11.3
+
+- Discards and breaks all the changes from 0.11.2. Sorry for the inconvenience. This is a
+  version exactly equal to 0.11.1 to get a proper behaviour while 0.12.0 arrives.
+
 ## 0.11.2 (discarded version)
 
 - Enable automatic re-dispatching of lost events based on the last-event-id field (thanks to @arkanovicz)
