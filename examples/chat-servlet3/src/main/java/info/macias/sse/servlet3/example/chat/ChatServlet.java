@@ -15,6 +15,7 @@ limitations under the License.
 */
 package info.macias.sse.servlet3.example.chat;
 
+import info.macias.see.example.ChatRoom;
 import info.macias.sse.servlet3.ServletEventTarget;
 
 import javax.servlet.AsyncContext;

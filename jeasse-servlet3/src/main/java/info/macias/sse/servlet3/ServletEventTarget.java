@@ -49,6 +49,7 @@ public class ServletEventTarget<I> implements EventTarget<I> {
      * @param request The {@link HttpServletRequest} reference, as sent by the subscriber.
      * @deprecated Use {@link #create(HttpServletRequest)}
      */
+    @Deprecated
     public ServletEventTarget(HttpServletRequest request) {
         asyncContext = request.startAsync();
         asyncContext.setTimeout(0);  // TODO: allow setting timeout

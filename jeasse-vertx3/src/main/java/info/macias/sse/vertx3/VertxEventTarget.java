@@ -18,27 +18,41 @@ package info.macias.sse.vertx3;
 
 import info.macias.sse.EventTarget;
 import info.macias.sse.events.MessageEvent;
+import info.macias.sse.subscribe.IdMapper;
 import info.macias.sse.subscribe.RemoteCompletionListener;
+import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServerRequest;
-
-import java.io.IOException;
 
 /**
  * SSE dispatcher for one-to-one connections from Server to client-side subscriber
  *
  * @author <a href="http://github.com/mariomac">Mario Macías</a>
  */
-public class VertxEventTarget implements EventTarget {
+public class VertxEventTarget<I> implements EventTarget<I> {
 
 
-	private HttpServerRequest request;
+    private HttpServerRequest request;
+    private RemoteCompletionListener<I> closeListener;
+    private I identifier;
 
     /**
      * Builds a new dispatcher from an {@link HttpServerRequest} object.
+     *
      * @param request The {@link HttpServerRequest} reference, as sent by the subscriber.
+     * @deprecated TODO put constructor
      */
+    @Deprecated
     public VertxEventTarget(HttpServerRequest request) {
-		this.request = request;
+        this.request = request;
+        ExceptionHandler eh = new ExceptionHandler();
+        request.exceptionHandler(eh);
+        request.response().exceptionHandler(eh).closeHandler(new CloseHandler());
+    }
+
+    private VertxEventTarget(HttpServerRequest request, IdMapper<HttpServerRequest, I> mapper) {
+        this.request = request;
+        request.exceptionHandler(new ExceptionHandler());
+        this.identifier = mapper.map(request);
     }
 
     /**
@@ -48,15 +62,16 @@ public class VertxEventTarget implements EventTarget {
      *     Cache-Control: no-cache
      *     Connection: keep-alive
      * </pre>
+     *
      * @return The same {@link VertxEventTarget} object that received the method call
      */
-	@Override
-    public VertxEventTarget ok() {
-		request.response().headers().add("Content-Type", "text/event-stream");
-		request.response().headers().add("Cache-Control", "no-cache");
-		request.response().headers().add("Connection", "keep-alive");
-		request.response().setStatusCode(200);
-		request.response().setChunked(true);
+    @Override
+    public VertxEventTarget<I> ok() {
+        request.response().headers().add("Content-Type", "text/event-stream");
+        request.response().headers().add("Cache-Control", "no-cache");
+        request.response().headers().add("Connection", "keep-alive");
+        request.response().setStatusCode(200);
+        request.response().setChunked(true);
         return this;
     }
 
@@ -65,49 +80,52 @@ public class VertxEventTarget implements EventTarget {
      *
      * @return The same {@link VertxEventTarget} object that received the method call
      */
-	@Override
-    public VertxEventTarget open() {
-		request.response().write("event: open\n\n");
-		return this;
+    @Override
+    public VertxEventTarget<I> open() {
+        request.response().write("event: open\n\n");
+        return this;
     }
 
     /**
      * Sends a {@link MessageEvent} to the subscriber, containing only 'event' and 'data' fields.
+     *
      * @param event The descriptor of the 'event' field.
-     * @param data The content of the 'data' field.
+     * @param data  The content of the 'data' field.
      * @return The same {@link VertxEventTarget} object that received the method call
      */
-	@Override
-    public VertxEventTarget send(String event, String data) {
-		request.response().write(
+    @Override
+    public VertxEventTarget<I> send(String event, String data) {
+        request.response().write(
                 new MessageEvent.Builder()
-                    .setData(data)
-                    .setEvent(event)
-                    .build()
-                    .toString()
+                        .setData(data)
+                        .setEvent(event)
+                        .build()
+                        .toString()
         );
         return this;
     }
 
     /**
      * Sends a {@link MessageEvent} to the subscriber
+     *
      * @param messageEvent The instance that encapsulates all the desired fields for the {@link MessageEvent}
      * @return The same {@link VertxEventTarget} object that received the method call
      */
-	@Override
-    public VertxEventTarget send(MessageEvent messageEvent) {
-		request.response().write(messageEvent.toString());
-		return this;
+    @Override
+    public VertxEventTarget<I> send(MessageEvent messageEvent) {
+        request.response().write(messageEvent.toString());
+        return this;
     }
 
     @Override
-    public Object getIdentifier() {
-        return null;
+    public I getIdentifier() {
+        return identifier;
     }
 
     @Override
-    public EventTarget onRemoteClose(RemoteCompletionListener listener) {
-        return null;
+    public EventTarget<I> onRemoteClose(RemoteCompletionListener<I> listener) {
+        closeListener = listener;
+        return this;
     }
 
     private boolean completed = false;
@@ -115,12 +133,37 @@ public class VertxEventTarget implements EventTarget {
     /**
      * Closes the connection between the server and the client.
      */
-	@Override
+    @Override
     public void close() {
-        if(!completed) {
-			completed = true;
-			request.response().close();
-			request.response().end();
+        System.out.println("Invoking close for " + identifier);
+        if (!completed) {
+            completed = true;
+            request.response().close();
+            request.response().end();
+            if (closeListener != null) {
+                closeListener.onClose(this);
+            }
         }
+    }
+
+    private class CloseHandler implements Handler<Void> {
+        @Override
+        public void handle(Void event) {
+            close();
+        }
+    }
+    private class ExceptionHandler implements Handler<Throwable> {
+        @Override
+        public void handle(Throwable event) {
+            close();
+        }
+    }
+
+    public static VertxEventTarget<HttpServerRequest> create(HttpServerRequest request) {
+        return create(request, IdMapper::identity);
+    }
+
+    public static <IdT> VertxEventTarget<IdT> create(HttpServerRequest request, IdMapper<HttpServerRequest, IdT> mapper) {
+        return new VertxEventTarget<>(request, mapper);
     }
 }

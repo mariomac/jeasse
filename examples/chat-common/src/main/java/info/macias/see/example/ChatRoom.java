@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package info.macias.sse.servlet3.example.chat;
+package info.macias.see.example;
 
 import info.macias.sse.EventBroadcast;
 import info.macias.sse.EventTarget;
