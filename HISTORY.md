@@ -1,5 +1,9 @@
 # History of releases
 
+## 0.11.4
+
+- Updates Vertx core dependencies whose old versions had a security issue. 
+
 ## 0.11.3
 
 - Discards and breaks all the changes from 0.11.2. Sorry for the inconvenience. This is a
